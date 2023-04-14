@@ -1,3 +1,7 @@
+<<<<<<< HEAD
 __pycache__/
 *.pyc
 .venv/
+=======
+tags
+>>>>>>> a2b4a40 (Added gitignore)
