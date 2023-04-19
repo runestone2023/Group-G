@@ -5,6 +5,7 @@ import selectors
 import types
 import json
 
+
 def main():
     sel = selectors.DefaultSelector()
     send_queue = []
@@ -28,8 +29,11 @@ def main():
                     service_connection(
                         key, mask, sel, send_queue, recv_queue)
 
-def process_message(message):
-    print(message)
+
+def handle_message(message, addr, send_queue):
+    print("Sending", message, "to", addr)
+    message['receiver'] = addr
+    send_queue.append(message)
 
 
 def accept_connection(sock, sel):
@@ -40,6 +44,7 @@ def accept_connection(sock, sel):
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(conn, events, data=data)
 
+
 def service_connection(key, mask, sel, send_queue, recv_queue):
     sock = key.fileobj
     data = key.data
@@ -47,13 +52,13 @@ def service_connection(key, mask, sel, send_queue, recv_queue):
 
     # Put messagges in the send buffer
     if len(send_queue) > 0:
-        if data.addr == send_queue[0].receiver:
-            data.outb += send_queue.pop(0)
+        if data.addr == send_queue[0]['receiver']:
+            data.outb += json.dumps(send_queue.pop(0)).encode('utf-8')
 
     # Put messages in the read buffer
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)
-        if recv_data: 
+        if recv_data:
             print("Received: ", recv_data, "from", data.addr)
             data.inb += recv_data
 
@@ -64,7 +69,7 @@ def service_connection(key, mask, sel, send_queue, recv_queue):
             if len(data.inb) >= data.message_length:
                 message = json.loads(data.inb[:data.message_length])
                 data.inb = data.inb[data.message_length:]
-                process_message(message)
+                handle_message(message, data.addr, send_queue)
 
         else:
             print(f"Closing connection to {data.addr}")

@@ -27,8 +27,7 @@ s = socket.socket()
 port = 65530                
 s.connect(('10.42.0.1', port))
 
-obj = { 'test' : 30,
-       'test1' : 31 }
+obj = { 'test' : 30, 'test1' : 31 }
 body = json.dumps(obj).encode('utf-8')
 print(body)
 message_length = len(body)
@@ -36,5 +35,7 @@ print(message_length)
 
 s.send(message_length.to_bytes(2, 'big'))
 s.send(body)
+
+print(json.loads(s.recv(1024)))
 
 s.close()          
