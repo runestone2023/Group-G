@@ -3,6 +3,7 @@
 import socket
 import selectors
 import types
+import json
 
 def main():
     sel = selectors.DefaultSelector()
@@ -14,6 +15,7 @@ def main():
         s.bind(('', port))
         s.listen(5)
         s.setblocking(False)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sel.register(s, selectors.EVENT_READ, data=None)
 
         while True:
@@ -25,6 +27,9 @@ def main():
                 else:
                     service_connection(
                         key, mask, sel, send_queue, recv_queue)
+
+def process_message(message):
+    print(message)
 
 
 def accept_connection(sock, sel):
@@ -38,7 +43,7 @@ def accept_connection(sock, sel):
 def service_connection(key, mask, sel, send_queue, recv_queue):
     sock = key.fileobj
     data = key.data
-    print(data)
+    data.message_length = 0
 
     # Put messagges in the send buffer
     if len(send_queue) > 0:
@@ -47,12 +52,20 @@ def service_connection(key, mask, sel, send_queue, recv_queue):
 
     # Put messages in the read buffer
     if mask & selectors.EVENT_READ:
-        print(key)
         recv_data = sock.recv(1024)
         if recv_data: 
-            print("Received: ", recv_data, " from ", data.addr)
+            print("Received: ", recv_data, "from", data.addr)
             data.inb += recv_data
-            # TODO: Parse message
+
+            if len(data.inb) >= 2 and data.message_length == 0:
+                data.message_length = int.from_bytes(data.inb[:2])
+                data.inb = data.inb[2:]
+
+            if len(data.inb) >= data.message_length:
+                message = json.loads(data.inb[:data.message_length])
+                data.inb = data.inb[data.message_length:]
+                process_message(message)
+
         else:
             print(f"Closing connection to {data.addr}")
             sel.unregister(sock)
