@@ -63,7 +63,7 @@ def service_connection(key, mask, sel, send_queue, recv_queue):
         if data.outb:
             print(f"Echoing {data.outb!r} to {data.addr}")
             sent = sock.send(data.outb)  # Should be ready to write
-            send_buffer = data.outb[sent:]
+            data.outb = data.outb[sent:]
 
 
 if __name__ == "__main__":
