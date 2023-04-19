@@ -34,7 +34,6 @@ def main():
         data = types.SimpleNamespace(addr=s.getsockname(), inb=b"", outb=b"")
         sel.register(s, events, data=data)
 
-        once = True
         while True:
             events = sel.select(timeout=10)
             for key, mask in events:
@@ -42,7 +41,6 @@ def main():
                     service_connection(
                         key, mask, sel, send_queue, recv_queue)
         
-            # Client Codes goes here
             if len(recv_queue) > 0:
                handle_message(recv_queue.pop(0), send_queue)
 
