@@ -13,7 +13,7 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list):
 
     # Put messagges in the send buffer
     if len(send_queue) > 0:
-        if data.addr == send_queue[0]['receiver']:
+        if data.addr == tuple(send_queue[0]['receiver']):
             message = send_queue.pop(0)
             body = json.dumps(message).encode('utf-8')
             data.outb += len(body).to_bytes(2, 'big')
