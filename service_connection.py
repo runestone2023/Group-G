@@ -15,7 +15,6 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list):
     if len(send_queue) > 0:
         if data.addr == send_queue[0]['receiver']:
             message = send_queue.pop(0)
-            message.sender = data.addr
             body = json.dumps(message).encode('utf-8')
             data.outb += len(body).to_bytes(2, 'big')
             data.outb += body

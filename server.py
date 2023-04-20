@@ -29,7 +29,7 @@ def robot_server(message_queue: list, handle_response):
                         key, mask, sel, message_queue, recv_queue)
 
             if len(recv_queue) > 0:
-                handle_response(recv_queue.pop(0), message_queue)
+                handle_response(recv_queue.pop(0))
 
 
 def connected_clients(sel) -> list:
