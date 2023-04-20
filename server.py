@@ -4,20 +4,19 @@ import socket
 import selectors
 import types
 import json
+
 from service_connection import service_connection
 
 
-def main():
-    sel = selectors.DefaultSelector()
-    send_queue = []
+def robot_server(message_queue: list, handle_response):
     recv_queue = []
+    sel = selectors.DefaultSelector()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        port = 65530
-        s.bind(('', port))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind(('', 65530))
         s.listen(5)
         s.setblocking(False)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sel.register(s, selectors.EVENT_READ, data=None)
 
         while True:
@@ -27,14 +26,10 @@ def main():
                     accept_connection(key.fileobj, sel)
                 else:
                     service_connection(
-                        key, mask, sel, send_queue, recv_queue)
+                        key, mask, sel, message_queue, recv_queue)
 
             if len(recv_queue) > 0:
-                handle_message(recv_queue.pop(0), send_queue)
-
-
-def handle_message(message, send_queue):
-    print(message)
+                handle_response(recv_queue.pop(0), message_queue)
 
 
 def connected_clients(sel) -> list:
@@ -47,7 +42,7 @@ def connected_clients(sel) -> list:
 
 
 def accept_connection(sock, sel):
-    conn, addr = sock.accept()  # Should be ready to read
+    conn, addr = sock.accept()
     print(f"Accepted connection from {addr}")
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
@@ -56,4 +51,6 @@ def accept_connection(sock, sel):
 
 
 if __name__ == "__main__":
-    main()
+    send_queue = []
+
+    robot_server(send_queue, print)
