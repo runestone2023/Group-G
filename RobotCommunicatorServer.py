@@ -6,38 +6,31 @@ import types
 import json
 import _thread
 
+from RobotCommunicator import RobotCommunicator
 from service_connection import service_connection
 
-class RobotCommunicatorServer:
+
+class RobotCommunicatorServer(RobotCommunicator):
     def __init__(self):
-        self._recv_messages = []
-        self._send_queue = []
-        self._connnected_clients = {}
+        super().__init__('', 65530)
 
     def start(self):
-        tid = _thread.start_new_thread(robot_server, (self._send_queue,
-                                                       self._connnected_clients,
-                                                       self._recv_messages.append,))
+        tid = _thread.start_new_thread(robot_server, (self.port,
+                                                      self._send_queue,
+                                                      self._connected_clients,
+                                                      self._recv_messages.append,))
+
     def list_clients(self):
-        return list(self._connnected_clients)
-
-    def send_message(self, msg: dict, client_id: int):
-        if client_id in self._connnected_clients:
-            body = msg.copy()
-            body['addr'] = self._connnected_clients[client_id]
-            self._send_queue.append(body)
-
-    def pop_message(self):
-        return self._recv_messages.pop(0)
+        return list(self._connected_clients)
 
 
-def robot_server(message_queue: list, connected_clients, handle_response):
+def robot_server(port, message_queue: list, connected_clients, handle_response):
     recv_queue = []
     sel = selectors.DefaultSelector()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind(('', 65530))
+        s.bind(('', port))
         s.listen(5)
         s.setblocking(False)
         sel.register(s, selectors.EVENT_READ, data=None)
