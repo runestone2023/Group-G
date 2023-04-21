@@ -44,4 +44,4 @@ def robot_client(host, port, message_queue, connected_clients, handle_message):
                         key, mask, sel, message_queue, recv_queue, connected_clients)
 
             if len(recv_queue) > 0:
-                handle_message(recv_queue.pop(0), message_queue)
+                handle_message(recv_queue.pop(0))

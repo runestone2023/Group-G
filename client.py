@@ -23,7 +23,11 @@ def main():
 
     robot_comm = RobotCommunicatorClient(HOST, PORT)
     robot_comm.start()
+    time.sleep(1)
     robot_comm.send_message({"tesing": "testing"})
+    time.sleep(1)
+    while True:
+        pass
 
 
 if __name__ == "__main__":
