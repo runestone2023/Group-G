@@ -3,28 +3,22 @@
 import _thread
 import uvicorn
 from fastapi import FastAPI
-from server import robot_server
+from RobotCommunicatorServer import RobotCommunicatorServer
 
 app = FastAPI()
+robot_server = RobotCommunicatorServer()
+robot_server.start()
 
+@app.get("/clients")
+async def clients():
+    return robot_server.list_clients()
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.get("/start")
+async def start():
+    robot_server.send_message({"operation" : "start"}, 0)
+    return {}
 
-
-def handle_robot_msg(message):
-    print(message)
-
-
-if __name__ == "__main__":
-    send_queue = []
-    tid = _thread.start_new_thread(
-        robot_server, (send_queue, handle_robot_msg))
-
-    uvicorn.run(
-        'main:app',
-        host="0.0.0.0",
-        port=80,
-        log_level="debug",
-    )
+@app.get("/stop")
+async def stop():
+    robot_server.send_message({"operation" : "stop"}, 0)
+    return {}

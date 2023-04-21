@@ -3,7 +3,7 @@ import selectors
 import types
 import json
 
-def service_connection(key, mask, sel, send_queue: list, recv_queue: list):
+def service_connection(key, mask, sel, send_queue: list, recv_queue: list, connected_clients: dict):
     """
     Sends messages from send_queue and inserts messages in the recv_queue
     """
@@ -37,6 +37,11 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list):
 
         else:
             print(f"Closing connection to {data.addr}")
+
+            for client_id, addr in list(connected_clients.items()):
+                if addr == data.addr:
+                    del connected_clients[client_id]
+
             sel.unregister(sock)
             sock.close()
 

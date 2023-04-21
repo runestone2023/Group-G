@@ -12,7 +12,7 @@ import types
 import json
 from service_connection import service_connection
 
-HOST = '127.0.0.1'
+HOST = '10.42.0.1'
 PORT = 65530
 
 def main():
@@ -39,7 +39,7 @@ def main():
             for key, mask in events:
                 if key.data is not None:
                     service_connection(
-                        key, mask, sel, send_queue, recv_queue)
+                        key, mask, sel, send_queue, recv_queue, {})
         
             if len(recv_queue) > 0:
                handle_message(recv_queue.pop(0), send_queue)

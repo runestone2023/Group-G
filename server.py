@@ -1,56 +1,24 @@
 #!/usr/bin/env python
 
-import socket
-import selectors
-import types
-import json
+import _thread
+import uvicorn
+from fastapi import FastAPI
+from RobotCommunicatorServer import RobotCommunicatorServer
 
-from service_connection import service_connection
+app = FastAPI()
+robot_server = RobotCommunicatorServer()
+robot_server.start()
 
+@app.get("/clients")
+async def clients():
+    return robot_server.list_clients()
 
-def robot_server(message_queue: list, handle_response):
-    recv_queue = []
-    sel = selectors.DefaultSelector()
+@app.get("/start")
+async def start():
+    robot_server.send_message({"operation" : "start"}, 0)
+    return {}
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind(('', 65530))
-        s.listen(5)
-        s.setblocking(False)
-        sel.register(s, selectors.EVENT_READ, data=None)
-
-        while True:
-            events = sel.select(timeout=10)
-            for key, mask in events:
-                if key.data is None:
-                    accept_connection(key.fileobj, sel)
-                else:
-                    service_connection(
-                        key, mask, sel, message_queue, recv_queue)
-
-            if len(recv_queue) > 0:
-                handle_response(recv_queue.pop(0))
-
-
-def connected_clients(sel) -> list:
-    result = []
-    for elem in sel.get_map():
-        key = sel.get_key(elem)
-        if key.data is not None:
-            result.append(key.data.addr)
-    return result
-
-
-def accept_connection(sock, sel):
-    conn, addr = sock.accept()
-    print(f"Accepted connection from {addr}")
-    conn.setblocking(False)
-    data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
-    events = selectors.EVENT_READ | selectors.EVENT_WRITE
-    sel.register(conn, events, data=data)
-
-
-if __name__ == "__main__":
-    send_queue = []
-
-    robot_server(send_queue, print)
+@app.get("/stop")
+async def stop():
+    robot_server.send_message({"operation" : "stop"}, 0)
+    return {}
