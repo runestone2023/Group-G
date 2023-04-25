@@ -12,6 +12,7 @@ import socket
 import selectors
 import types
 import json
+import time
 import _thread
 
 
@@ -70,20 +71,34 @@ class RobotCommunicatorServer(RobotCommunicator):
 
 
 class RobotCommunicatorClient(RobotCommunicator):
-    def __init__(self, host, port):
+    def __init__(self, host, port, timeout=2):
         super().__init__(host, port)
+        self.timeout = timeout
 
     def start(self):
+        start = time.time()
         tid = _thread.start_new_thread(robot_tcp_client, (self.host,
                                                           self.port,
                                                           self._send_queue,
                                                           self._connected_clients,
                                                           self._recv_messages.append,))
-        while len(self._connected_clients) < 1:
-            pass
 
-    def send_message(self, msg: dict):
-        super().send_message(msg, 0)
+        while time.time() - start < self.timeout:
+            if len(self._connected_clients) > 0:
+                return
+            time.sleep(0.1)
+
+    def send_message(self, msg: dict) -> bool:
+        """
+        Sends a message to the server. Blocks untill timeout is exceeded or
+        message is sent to the send buffer
+
+        :param msg: The message to be sent as a dictionary.
+        :return: True if the message was sent, False otherwise.
+        """
+        if not self.is_connected():
+            self.start()
+        return super().send_message(msg, 0)
 
     def is_connected(self) -> bool:
         return len(self._connected_clients) > 0
@@ -95,23 +110,34 @@ def robot_tcp_client(host, port, message_queue, connected_clients, handle_messag
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print("Connecting to", host, port)
 
-        s.connect((host, port))
-        s.setblocking(False)
-        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        try:
+            s.connect((host, port))
 
-        data = types.SimpleNamespace(addr=s.getsockname(), inb=b"", outb=b"")
-        sel.register(s, events, data=data)
+            s.setblocking(False)
+            events = selectors.EVENT_READ | selectors.EVENT_WRITE
 
-        connected_clients[0] = s.getsockname()
-        while True:
-            events = sel.select(timeout=10)
-            for key, mask in events:
-                if key.data is not None:
-                    service_connection(
-                        key, mask, sel, message_queue, recv_queue, connected_clients)
+            data = types.SimpleNamespace(
+                addr=s.getsockname(), inb=b"", outb=b"")
+            sel.register(s, events, data=data)
 
-            if len(recv_queue) > 0:
-                handle_message(recv_queue.pop(0))
+            connected_clients[0] = s.getsockname()
+            while len(connected_clients) > 0:
+                events = sel.select(timeout=10)
+                for key, mask in events:
+                    if key.data is not None:
+                        service_connection(
+                            key, mask, sel, message_queue, recv_queue, connected_clients)
+
+                if len(recv_queue) > 0:
+                    handle_message(recv_queue.pop(0))
+
+        except:
+            print("Error: Host not found")
+
+    sel.close()
+    time.sleep(0.25)
+    robot_tcp_client(host, port, message_queue,
+                     connected_clients, handle_message)
 
 
 def robot_tcp_server(port, message_queue: list, connected_clients, handle_response):
@@ -126,7 +152,7 @@ def robot_tcp_server(port, message_queue: list, connected_clients, handle_respon
         sel.register(s, selectors.EVENT_READ, data=None)
 
         while True:
-            events = sel.select(timeout=10)
+            events = sel.select(timeout=None)
             for key, mask in events:
                 if key.data is None:
                     accept_connection(key.fileobj, sel, connected_clients)

@@ -8,8 +8,9 @@ from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 
 from RobotCommunicator import RobotCommunicatorClient
+import time
 
-HOST = '127.0.0.1'
+HOST = '10.42.0.1'
 PORT = 65530
 
 
@@ -21,8 +22,10 @@ def main():
     ev3.speaker.beep()
 
     robot_comm = RobotCommunicatorClient(HOST, PORT)
-    robot_comm.start()
-    robot_comm.send_message({"tesing": "testing"})
+    res = robot_comm.send_message({"tesing": "testing"})
+    print(res)
+    time.sleep(1)
+
 
 if __name__ == "__main__":
     main()
