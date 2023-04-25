@@ -184,13 +184,14 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list, conne
     sock = key.fileobj
     data = key.data
     data.message_length = 0
+    header_size = 2
 
     # Put messagges in the send buffer
     if len(send_queue) > 0:
         if data.addr == tuple(send_queue[0]['addr']):
             message = send_queue.pop(0)
             body = json.dumps(message).encode('utf-8')
-            data.outb += len(body).to_bytes(2, 'big')
+            data.outb += len(body).to_bytes(header_size, 'big')
             data.outb += body
 
     # Put messages in the read buffer
@@ -200,9 +201,9 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list, conne
             print("Received: ", recv_data, "from", data.addr)
             data.inb += recv_data
 
-            if len(data.inb) >= 2 and data.message_length == 0:
-                data.message_length = int.from_bytes(data.inb[:2])
-                data.inb = data.inb[2:]
+            if len(data.inb) >= header_size and data.message_length == 0:
+                data.message_length = int.from_bytes(data.inb[:header_size])
+                data.inb = data.inb[header_size:]
 
             if len(data.inb) >= data.message_length:
                 message = json.loads(data.inb[:data.message_length])
