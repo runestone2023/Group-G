@@ -131,8 +131,8 @@ def robot_tcp_client(host, port, message_queue, connected_clients, handle_messag
                 if len(recv_queue) > 0:
                     handle_message(recv_queue.pop(0))
 
-        except:
-            print("Error: Host not found")
+        except Exception as e:
+            print(e)
 
     sel.close()
     time.sleep(0.25)
@@ -169,7 +169,7 @@ def accept_connection(sock, sel, connected_clients):
     Accepts a connection from a client
     """
     conn, addr = sock.accept()
-    print(f"Accepted connection from {addr}")
+    print("Accepted connection from", addr)
     connected_clients[len(connected_clients)] = addr
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
@@ -184,13 +184,14 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list, conne
     sock = key.fileobj
     data = key.data
     data.message_length = 0
+    header_size = 2
 
     # Put messagges in the send buffer
     if len(send_queue) > 0:
         if data.addr == tuple(send_queue[0]['addr']):
             message = send_queue.pop(0)
             body = json.dumps(message).encode('utf-8')
-            data.outb += len(body).to_bytes(2, 'big')
+            data.outb += len(body).to_bytes(header_size, 'big')
             data.outb += body
 
     # Put messages in the read buffer
@@ -201,16 +202,16 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list, conne
             data.inb += recv_data
 
             if len(data.inb) >= 2 and data.message_length == 0:
-                data.message_length = int.from_bytes(data.inb[:2])
-                data.inb = data.inb[2:]
+                data.message_length = int.from_bytes(data.inb[:header_size], 'big')
+                data.inb = data.inb[header_size:]
 
             if len(data.inb) >= data.message_length:
-                message = json.loads(data.inb[:data.message_length])
+                message = json.loads(data.inb[:data.message_length].decode('utf-8'))
                 data.inb = data.inb[data.message_length:]
                 recv_queue.append(message)
 
         else:
-            print(f"Closing connection to {data.addr}")
+            print("Closing connection to", data.addr)
 
             for client_id, addr in list(connected_clients.items()):
                 if addr == data.addr:
@@ -222,6 +223,6 @@ def service_connection(key, mask, sel, send_queue: list, recv_queue: list, conne
     # Send messages in the send buffer
     if mask & selectors.EVENT_WRITE:
         if data.outb:
-            print(f"Sending {data.outb!r} to {data.addr}")
+            print("Sending", data.outb, " to ", data.addr)
             sent = sock.send(data.outb)
             data.outb = data.outb[sent:]

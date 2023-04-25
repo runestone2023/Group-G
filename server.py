@@ -12,16 +12,25 @@ app = FastAPI()
 robot_server = RobotCommunicatorServer(IP, PORT)
 robot_server.start()
 
+
 @app.get("/clients")
 async def clients():
     return robot_server.list_clients()
 
-@app.get("/start")
-async def start():
-    robot_server.send_message({"operation" : "start"}, 0)
-    return {}
 
-@app.get("/stop")
+@app.post("/start")
+async def start():
+    result = {}
+    for client_id in robot_server.list_clients():
+        result[client_id] = robot_server.send_message(
+            {"op": "start"}, client_id)
+    return result
+
+
+@app.post("/stop")
 async def stop():
-    robot_server.send_message({"operation" : "stop"}, 0)
-    return {}
+    result = {}
+    for client_id in robot_server.list_clients():
+        result[client_id] = robot_server.send_message(
+            {"op": "start"}, client_id)
+    return result
