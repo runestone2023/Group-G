@@ -3,10 +3,13 @@
 import _thread
 import uvicorn
 from fastapi import FastAPI
-from RobotCommunicatorServer import RobotCommunicatorServer
+from RobotCommunicator import RobotCommunicatorServer
+
+IP = ''
+PORT = 65530
 
 app = FastAPI()
-robot_server = RobotCommunicatorServer()
+robot_server = RobotCommunicatorServer(IP, PORT)
 robot_server.start()
 
 @app.get("/clients")
