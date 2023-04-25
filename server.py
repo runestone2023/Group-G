@@ -18,10 +18,12 @@ async def clients():
 
 @app.get("/start")
 async def start():
-    robot_server.send_message({"operation" : "start"}, 0)
+    for client_id in robot_server.list_clients():
+        robot_server.send_message({"operation" : "start"}, client_id)
     return {}
 
 @app.get("/stop")
 async def stop():
-    robot_server.send_message({"operation" : "stop"}, 0)
+    for client_id in robot_server.list_clients():
+        robot_server.send_message({"operation" : "stop"}, client_id)
     return {}
