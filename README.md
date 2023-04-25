@@ -21,3 +21,8 @@ Dinh Ngoc Khue, Vu Pham Viet Honag, Dinh Huu Dai, Amir Masoud Baghi, Viktor Bjö
 ## Communication
 
 Discord and GitHub Projects
+
+## Running the project
+
+`make init` to install dependencies, `make server` to run the server, and `make
+client` to run the client.
