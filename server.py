@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
 import _thread
-import uvicorn
 from fastapi import FastAPI
 from RobotCommunicator import RobotCommunicatorServer
+from models import MoveCmd, RotateCmd
 
-IP = ''
 PORT = 65530
 
 app = FastAPI()
-robot_server = RobotCommunicatorServer(IP, PORT)
+robot_server = RobotCommunicatorServer('', PORT)
 robot_server.start()
 
 
@@ -17,20 +16,21 @@ robot_server.start()
 async def clients():
     return robot_server.list_clients()
 
-
-@app.post("/start")
-async def start():
-    result = {}
-    for client_id in robot_server.list_clients():
-        result[client_id] = robot_server.send_message(
-            {"op": "start"}, client_id)
-    return result
+@app.post("/clients/{client_id}/shutdown")
+async def shutdown(client_id):
+    res = robot_server.send_message({'command': 'shutdown'}, client_id)
+    return {"client_id": client_id, 'move_forward': res}
 
 
-@app.post("/stop")
-async def stop():
-    result = {}
-    for client_id in robot_server.list_clients():
-        result[client_id] = robot_server.send_message(
-            {"op": "start"}, client_id)
-    return result
+@app.post("/clients/{client_id}/move")
+async def send_move(client_id: int, body: MoveCmd):
+    res = robot_server.send_message(
+        {'command': 'move_forward', 'speed': body.speed, 'distance': body.distance}, client_id)
+    return {"client_id": client_id, 'move_forward': res}
+
+
+@app.post("/clients/{client_id}/rotate")
+async def send_rotate(client_id: int, body: RotateCmd):
+    res = robot_server.send_message(
+        {'command': 'rotate', 'angle': body.angle}, client_id)
+    return {"client_id": client_id, 'move_forward': res}
