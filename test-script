@@ -51,5 +51,9 @@ while true; do
 		curl -X 'POST' \
 			'http://127.0.0.1:8000/clients/0/beep'
   fi
+  if [ "$input" = "x" ]; then
+		curl -X 'POST' \
+			'http://127.0.0.1:8000/clients/0/shutdown'
+  fi
   echo
 done

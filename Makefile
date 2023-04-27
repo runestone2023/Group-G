@@ -14,4 +14,5 @@ server:
 	${PYTHON} -m uvicorn server:app --reload
 
 client:
-	./client.py
+	@scp -r *.py robot@10.42.0.3:~/ev3-project/
+	@ssh robot@10.42.0.3 '~/ev3-project/client.py'

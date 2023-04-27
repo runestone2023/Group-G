@@ -19,7 +19,7 @@ async def clients():
 
 
 @app.post("/clients/{client_id}/shutdown")
-async def shutdown(client_id):
+async def shutdown(client_id: int):
     res = robot_server.send_message({'command': 'shutdown'}, client_id)
     return {"client_id": client_id, 'shutdown': res}
 
