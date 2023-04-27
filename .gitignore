@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 .venv/
 tags
-./test-script-wsl
+test-script-wsl
