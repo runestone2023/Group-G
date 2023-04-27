@@ -24,10 +24,14 @@ def move_forward(speed):
 def steer(angle):
     steering_motors.on_for_degrees(-100, 30, rotate_angle_factor * angle)
 
+def claw(grab):
+    claw.on_for_rotations(100 if grab else -100, 1)
+
 
 if __name__ == "__main__":
     robot_comm = RobotCommunicatorClient(HOST, PORT)
     steering_motors = MoveSteering(OUTPUT_B, OUTPUT_C, motor_class=LargeMotor)
+    claw = LargeMotor(OUTPUT_A)
 
     sound = Sound()
 
@@ -49,6 +53,10 @@ if __name__ == "__main__":
 
         elif command == "beep":
             sound.beep()
+
+        elif command == "claw":
+            grab = msg.get("grab")
+            claw(grab)
 
         elif command == "shut_down":
             break

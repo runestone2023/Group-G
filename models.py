@@ -5,3 +5,6 @@ class MoveCmd(BaseModel):
 
 class RotateCmd(BaseModel):
     angle: float
+
+class ClawCmd(BaseModel):
+    grab: bool

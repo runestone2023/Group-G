@@ -4,7 +4,7 @@ import _thread
 import time
 from fastapi import FastAPI
 from RobotCommunicator import RobotCommunicatorServer
-from models import MoveCmd, RotateCmd
+from models import MoveCmd, RotateCmd, ClawCmd
 
 PORT = 65530
 
@@ -41,4 +41,10 @@ async def send_rotate(client_id: int, body: RotateCmd):
 async def send_beep(client_id: int):
     res = robot_server.send_message(
         {'command': 'beep'}, client_id)
+    return {"client_id": client_id, 'beep': res}
+
+@app.post("/clients/{client_id}/claw")
+async def send_claw(client_id: int, body: ClawCmd ):
+    res = robot_server.send_message(
+            {'command': 'claw', 'grab' : body.grab}, client_id)
     return {"client_id": client_id, 'beep': res}

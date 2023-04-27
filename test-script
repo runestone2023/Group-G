@@ -55,5 +55,14 @@ while true; do
 		curl -X 'POST' \
 			'http://127.0.0.1:8000/clients/0/shutdown'
   fi
+  if [ "$input" = "c" ]; then
+    curl -X 'POST' \
+      'http://127.0.0.1:8000/clients/0/claw' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d '{
+          "grab": true
+        }'
+  fi
   echo
 done
