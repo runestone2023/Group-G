@@ -15,6 +15,7 @@ import time
 HOST = '10.42.0.1'
 PORT = 65530
 rotate_angle_factor = 2.39
+max_distance_us = 100
 
 
 def move_forward(speed):
@@ -53,6 +54,12 @@ if __name__ == "__main__":
         elif command == "claw":
             grab = msg.get("grab")
             claw.on_for_rotations(100 if grab else -100, 1)
+
+        elif command == "scan":
+            us = UltrasonicSensor()
+            distance = us.distance_centimeters
+            obj_type = "obs" if distance <= max_distance_us else "free"
+            robot_comm.send_message({"distance": distance, "type": obj_type})
 
         elif command == "shut_down":
             break
