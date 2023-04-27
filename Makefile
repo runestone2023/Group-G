@@ -15,4 +15,4 @@ server:
 
 client:
 	@scp -r *.py robot@10.42.0.3:~/ev3-project/
-	@ssh robot@10.42.0.3 '~/ev3-project/client.py'
+	@ssh robot@10.42.0.3 '~/ev3-project/client.py && pkill python'
