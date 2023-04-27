@@ -3,7 +3,7 @@
 import socket
 import time
 
-from ev3dev2.motor import (OUTPUT_B, OUTPUT_C, OUTPUT_D, LargeMotor,
+from ev3dev2.motor import (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, LargeMotor,
                            MediumMotor, MoveSteering)
 from ev3dev2.sensor.lego import UltrasonicSensor
 from ev3dev2.sound import Sound
@@ -24,14 +24,10 @@ def move_forward(speed):
 def steer(angle):
     steering_motors.on_for_degrees(-100, 30, rotate_angle_factor * angle)
 
-def claw(grab):
-    claw.on_for_rotations(100 if grab else -100, 1)
-
-
 if __name__ == "__main__":
     robot_comm = RobotCommunicatorClient(HOST, PORT)
     steering_motors = MoveSteering(OUTPUT_B, OUTPUT_C, motor_class=LargeMotor)
-    claw = LargeMotor(OUTPUT_A)
+    claw = MediumMotor(OUTPUT_D)
 
     sound = Sound()
 
@@ -56,7 +52,7 @@ if __name__ == "__main__":
 
         elif command == "claw":
             grab = msg.get("grab")
-            claw(grab)
+            claw.on_for_rotations(100 if grab else -100, 1)
 
         elif command == "shut_down":
             break
