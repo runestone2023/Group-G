@@ -48,3 +48,9 @@ async def send_claw(client_id: int, body: ClawCmd ):
     res = robot_server.send_message(
             {'command': 'claw', 'grab' : body.grab}, client_id)
     return {"client_id": client_id, 'beep': res}
+
+@app.post("/clients/{client_id}/scan")
+async def send_scan(client_id: int):
+    res = robot_server.send_message(
+            {'command': 'scan'}, client_id)
+    return {"client_id": client_id, 'scan_result': res}
