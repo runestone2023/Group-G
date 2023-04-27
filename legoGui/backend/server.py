@@ -25,7 +25,12 @@ robot_server.start()
 
 @app.get("/clients")
 async def clients():
-    return robot_server.list_clients()
+    result = [{
+        "clientID" : "1",
+        "robot" : "SWE1"
+    }]
+    # return robot_server.list_clients()
+    return result
 
 
 @app.post("/start")

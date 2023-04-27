@@ -31,13 +31,72 @@ function App() {
       .then((res) => console.log(res.data, res));
   };
 
+  const fetchClientHandler = () => {
+    axios
+      .get("http://localhost:8000/clients/")
+      .then((res) => console.log(res.data));
+  };
+
   return (
     <>
-      <nav class="navbar navbar-dark bg-primary mb-3">RuneStone GroupG</nav>
+      <nav className="navbar navbar-dark bg-primary mb-3">RuneStone GroupG</nav>
 
       <Container className="container-fluid mb-2 w-50 p-3">
-        <div class="row">
-          <div class="col-sm">
+        <div className="row">
+          {/* Robot Selection Panel */}
+          <div className="col-sm">
+            <Card className="border border-primary">
+              <p>Enable</p>
+              <button
+                type="button"
+                className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                style={{
+                  color: "white",
+                }}
+                onClick={fetchClientHandler}
+              >
+                Fetch
+              </button>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="flexRadioDefault"
+                  id="flexRadioDefault1"
+                />
+                <label class="form-check-label" for="flexRadioDefault1">
+                  Robot 1
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="flexRadioDefault"
+                  id="flexRadioDefault2"
+                  checked
+                />
+                <label class="form-check-label" for="flexRadioDefault2">
+                  Robot 2
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="flexRadioDefault"
+                  id="flexRadioDefault3"
+                  checked
+                />
+                <label class="form-check-label" for="flexRadioDefault3">
+                  Robot 3
+                </label>
+              </div>
+            </Card>
+          </div>
+
+          {/* Power Mode */}
+          <div className="col-sm">
             <Card className="border border-primary">
               Power
               <div
@@ -72,8 +131,9 @@ function App() {
       </Container>
 
       <Container className="container-fluid">
-        <div class="row">
-          <div class="col-sm">
+        <div className="row">
+          {/* Movement Control */}
+          <div className="col-sm">
             <Card className="border border-primary">
               Controls
               <div
@@ -90,7 +150,7 @@ function App() {
                 >
                   Left
                 </button>
-                <div class="btn-group-vertical">
+                <div className="btn-group-vertical">
                   <button
                     type="button"
                     className="btn btn-primary btn-outline-danger my-3 btn-lg"
@@ -124,7 +184,7 @@ function App() {
           </div>
 
           {/* Rotate Section */}
-          <div class="col-sm">
+          <div className="col-sm">
             <Card className="border border-primary">
               Controls
               <div
@@ -141,7 +201,7 @@ function App() {
                 >
                   Rotate Left
                 </button>
-                <div class="btn-group-vertical">
+                <div className="btn-group-vertical">
                   <button
                     type="button"
                     className="btn btn-primary btn-outline-danger my-3 btn-lg"
@@ -174,12 +234,12 @@ function App() {
             </Card>
           </div>
           {/* Liive Stream */}
-          <div class="col-sm">
+          <div className="col-sm">
             <Card className="border border-primary">
               Youtube Live
-              <div class="embed-responsive embed-responsive-1by1">
+              <div className="embed-responsive embed-responsive-1by1">
                 <iframe
-                  class="embed-responsive-item"
+                  className="embed-responsive-item"
                   // src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0"
                   src="https://www.youtube.com/embed/HsLqiShzP0k?rel=0"
                   allowFullScreen
