@@ -30,11 +30,6 @@ res = robot_comm.send_message({"tesing": "testing"})
 print(res)
 time.sleep(1)
 
-def say(msg):
-    if SOUND_ON:
-        sound.speak(msg)
-    print(msg)
-
 # Initialize the motors
 steering_motors = MoveSteering(OUTPUT_B, OUTPUT_C, motor_class=LargeMotor)
 sensor_rotation_motor = MediumMotor(OUTPUT_D)
@@ -63,7 +58,6 @@ def reset_sensor_rotation():
     rotate_sensor(-sensor_orientation / sensor_rotation_multiplier, speed=20)
 
 # Functions to read sensor
-
 def read_sensor(angle):
     m = us_sensor.distance_centimeters
     if m <= max_sensor_read_distance:
@@ -100,8 +94,15 @@ def scan(interval, num_scans, clockwise=True):
         read_send_sensor(rotation_angle)
 
     robot_comm.send_message({"action": "scan_end"})
-    
 
+# Functions for sound
+def beep():
+    sound.beep()
+    
+def say(msg):
+    if SOUND_ON:
+        sound.speak(msg)
+    print(msg)
 
 if __name__ == "__main__":
 
@@ -121,6 +122,10 @@ if __name__ == "__main__":
             reset_sensor_rotation()
         elif command == "rotate_sensor":
             rotate_sensor(msg.get("angle"))
+        elif command == "beep":
+            beep()
+        elif command == "say":
+            say(msg.get("msg"))
         elif command == "shut_down":
             break
         else:
