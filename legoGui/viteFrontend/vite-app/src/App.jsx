@@ -37,6 +37,30 @@ function App() {
       .then((res) => console.log(res.data));
   };
 
+  const moveForwardHandler = () => {
+    axios.post("http://localhost:8000/clients/0/move", {
+      speed: 0,
+    });
+  };
+
+  const moveBackHandler = () => {
+    axios.post("http://localhost:8000/<move back  api call>/", {
+      // The data format
+    });
+  };
+
+  const moveLeftHandler = () => {
+    axios.post("http://localhost:8000/<move left  api call>/", {
+      // The data format
+    });
+  };
+
+  const moveRightHandler = () => {
+    axios.post("http://localhost:8000/<move right  api call>/", {
+      // The data format
+    });
+  };
+
   return (
     <>
       <nav className="navbar navbar-dark bg-primary mb-3">RuneStone GroupG</nav>
@@ -147,6 +171,7 @@ function App() {
                   style={{
                     color: "white",
                   }}
+                  onClick={moveLeftHandler}
                 >
                   Left
                 </button>
@@ -157,8 +182,9 @@ function App() {
                     style={{
                       color: "white",
                     }}
+                    onClick={moveForwardHandler}
                   >
-                    Up
+                    Forward
                   </button>
                   <button
                     type="button"
@@ -166,8 +192,9 @@ function App() {
                     style={{
                       color: "white",
                     }}
+                    onClick={moveBackHandler}
                   >
-                    Middle
+                    Back
                   </button>
                 </div>
                 <button
@@ -176,6 +203,7 @@ function App() {
                   style={{
                     color: "white",
                   }}
+                  onClick={moveRightHandler}
                 >
                   Right
                 </button>
