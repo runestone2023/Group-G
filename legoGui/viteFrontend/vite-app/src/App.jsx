@@ -39,7 +39,7 @@ function App() {
 
   const moveForwardHandler = () => {
     axios.post("http://localhost:8000/clients/0/move", {
-      speed: 0,
+      speed: 100,
     });
   };
 
