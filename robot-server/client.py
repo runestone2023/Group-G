@@ -135,7 +135,7 @@ if __name__ == "__main__":
             print("Learning angle")
             learn_angle_pid(msg.get("iters"))       
 
-        elif command == "shut_down":
+        elif command == "shutdown":
             motors.stop()
             break
 

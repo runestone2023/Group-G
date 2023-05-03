@@ -17,6 +17,11 @@ while true; do
       -H 'Content-Type: application/json' \
       -d "{ \"speed\": 0 }"
   fi
+  if [ "$input" = "i" ]; then
+    cmd.exe /C curl -X 'GET' \
+      'http://127.0.0.1:8000/clients' \
+      -H 'accept: application/json' 
+  fi
   if [ "$input" = "a" ]; then
 		cmd.exe /C curl -X 'POST' \
 			'http://127.0.0.1:8000/clients/0/rotate' \
