@@ -5,10 +5,21 @@ import time
 from fastapi import FastAPI
 from RobotCommunicator import RobotCommunicatorServer
 from models import MoveCmd, RotateCmd, ClawCmd
+from fastapi.middleware.cors import CORSMiddleware
+
 
 PORT = 65530
 
 app = FastAPI()
+# we need this middleware to communicate with the ui , as they are in different ports(3000 for ui & 8000 for backend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = ['http://localhost:3000'],
+    allow_credentials = True,
+    allow_methods = ['*'],
+    allow_headers = ["*"]
+)
+
 robot_server = RobotCommunicatorServer('', PORT)
 robot_server.start()
 
