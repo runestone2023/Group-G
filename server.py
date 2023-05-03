@@ -4,7 +4,7 @@ import _thread
 import time
 from fastapi import FastAPI
 from RobotCommunicator import RobotCommunicatorServer
-from models import MoveCmd, RotateCmd, ClawCmd
+from models import MoveCmd, RotateCmd, ClawCmd, LearnCmd
 
 PORT = 65530
 
@@ -54,3 +54,9 @@ async def send_scan(client_id: int):
     res = robot_server.send_message(
             {'command': 'scan'}, client_id)
     return {"client_id": client_id, 'scan_result': res}
+
+@app.post("/clients/{client_id}/learn")
+async def send_learn(client_id: int, body: LearnCmd):
+    res = robot_server.send_message(
+            {'command': 'learn_angle', 'iters': body.iters}, client_id)
+    return {"client_id": client_id, 'learn_result': res}

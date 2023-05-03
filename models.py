@@ -8,3 +8,6 @@ class RotateCmd(BaseModel):
 
 class ClawCmd(BaseModel):
     grab: bool
+
+class LearnCmd(BaseModel):
+    iters: int
