@@ -1,0 +1,72 @@
+#!/bin/bash
+
+while true; do
+  prev_inp=$input
+  read -rsn1 input
+  if [ "$input" = "w" ]; then
+    cmd.exe /C curl -X 'POST' \
+      'http://127.0.0.1:8000/clients/0/move' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d "{ \"speed\": 100 }"
+  fi
+  if [ "$input" = "s" ]; then
+    cmd.exe /C curl -X 'POST' \
+      'http://127.0.0.1:8000/clients/0/move' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d "{ \"speed\": 0 }"
+  fi
+  if [ "$input" = "a" ]; then
+		cmd.exe /C curl -X 'POST' \
+			'http://127.0.0.1:8000/clients/0/rotate' \
+			-H 'accept: application/json' \
+			-H 'Content-Type: application/json' \
+			-d "{ \"angle\": \"-45\" }"
+  fi
+  if [ "$input" = "d" ]; then
+		cmd.exe /C curl -X 'POST' \
+			'http://127.0.0.1:8000/clients/0/rotate' \
+			-H 'accept: application/json' \
+			-H 'Content-Type: application/json' \
+			-d "{ \"angle\": 45 }"
+  fi
+  if [ "$input" = "r" ]; then
+		cmd.exe /C curl -X 'POST' \
+			'http://127.0.0.1:8000/clients/0/rotate' \
+			-H 'accept: application/json' \
+			-H 'Content-Type: application/json' \
+			-d "{ \"angle\": 360 }"
+  fi
+  if [ "$input" = "b" ]; then
+		cmd.exe /C curl -X 'POST' \
+			'http://127.0.0.1:8000/clients/0/beep'
+  fi
+  if [ "$input" = "x" ]; then
+		cmd.exe /C curl -X 'POST' \
+			'http://127.0.0.1:8000/clients/0/shutdown'
+  fi
+  if [ "$input" = "C" ]; then
+    cmd.exe /C curl -X 'POST' \
+      'http://127.0.0.1:8000/clients/0/claw' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d "{ \"grab\": false }"
+  fi
+  if [ "$input" = "c" ]; then
+    cmd.exe /C curl -X 'POST' \
+      'http://127.0.0.1:8000/clients/0/claw' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d "{ \"grab\": true }"
+  fi
+  if [ "$input" = "l" ]; then
+       cmd.exe /C curl -X 'POST' \
+      'http://127.0.0.1:8000/clients/0/learn' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d "{ \"iters\": 100 }"
+  fi
+
+  echo
+done
