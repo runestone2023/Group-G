@@ -18,6 +18,19 @@ function App() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [now, setNow] = useState("");
+  const [idValue, setId] = useState("");
+  let id = 0;
+
+  function handle() {
+    id = idValue;
+    console.log(id);
+  }
+
+  const radioButtonClicked = (e) => {
+    // setId(e.target.value);
+    id = e.target.value;
+    console.log(id);
+  };
 
   const startHandler = () => {
     axios
@@ -31,34 +44,73 @@ function App() {
       .then((res) => console.log(res.data, res));
   };
 
-  const fetchClientHandler = () => {
+  const learnHandler = () => {
     axios
-      .get("http://localhost:8000/clients/")
-      .then((res) => console.log(res.data));
+      .post(`http://localhost:8000/clients/${id}/learn`, {
+        iters: 100,
+      })
+      .then((res) => console.log(res.data, res));
   };
 
+  // move forward
   const moveForwardHandler = () => {
-    axios.post("http://localhost:8000/clients/0/move", {
-      speed: 100,
-    });
+    axios
+      .post(`http://localhost:8000/clients/${id}/move`, {
+        speed: 100,
+      })
+      .then((res) => console.log(res.data, res));
   };
 
+  // break
+  const breakHandler = () => {
+    axios
+      .post(`http://localhost:8000/clients/${id}/move`, {
+        speed: 0,
+      })
+      .then((res) => console.log(res.data, res));
+  };
+
+  // back
   const moveBackHandler = () => {
-    axios.post("http://localhost:8000/<move back  api call>/", {
-      // The data format
-    });
+    axios
+      .post(`http://localhost:8000/clients/${id}/move`, {
+        speed: -100,
+      })
+      .then((res) => console.log(res.data, res));
   };
 
   const moveLeftHandler = () => {
-    axios.post("http://localhost:8000/<move left  api call>/", {
-      // The data format
-    });
+    axios
+      .post(`http://localhost:8000/clients/${id}/rotate`, {
+        angle: -45,
+      })
+      .then((res) => console.log(res.data, res));
   };
 
   const moveRightHandler = () => {
-    axios.post("http://localhost:8000/<move right  api call>/", {
-      // The data format
-    });
+    axios
+      .post(`http://localhost:8000/clients/${id}/rotate`, {
+        angle: 45,
+      })
+      .then((res) => console.log(res.data, res));
+  };
+
+  // claw on
+  const clawOnHandler = () => {
+    axios
+      .post(`http://localhost:8000/clients/${id}/claw`, {
+        grab: true,
+      })
+      .then((res) => console.log(res.data, res));
+  };
+
+  // claw off
+  const clawOffHandler = () => {
+    axios
+      .post(`http://localhost:8000/clients/${id}/claw`, {
+        grab: false,
+      })
+      .then((res) => console.log(res.data, res));
   };
 
   return (
@@ -70,52 +122,30 @@ function App() {
           {/* Robot Selection Panel */}
           <div className="col-sm">
             <Card className="border border-primary">
-              <p>Enable</p>
-              <button
-                type="button"
-                className="btn btn-primary btn-outline-danger my-3 btn-lg"
-                style={{
-                  color: "white",
-                }}
-                onClick={fetchClientHandler}
-              >
-                Fetch
-              </button>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="flexRadioDefault1"
-                />
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Robot 1
-                </label>
-              </div>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="flexRadioDefault2"
-                  checked
-                />
-                <label class="form-check-label" for="flexRadioDefault2">
-                  Robot 2
-                </label>
-              </div>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="flexRadioDefault3"
-                  checked
-                />
-                <label class="form-check-label" for="flexRadioDefault3">
-                  Robot 3
-                </label>
-              </div>
+              <form class="form-inline">
+                <div class="form-group">
+                  <label for="inputRobot" class="sr-only">
+                    Enter the Bot ID
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="inputRobot"
+                    placeholder="Bot id"
+                    value={idValue}
+                    onChange={(e) => {
+                      setId(e.target.value);
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-primary mt-2"
+                  onClick={handle}
+                >
+                  Confirm
+                </button>
+              </form>
             </Card>
           </div>
 
@@ -148,6 +178,17 @@ function App() {
                 >
                   Turn Off
                 </button>
+                {/* Learn */}
+                <button
+                  type="button"
+                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
+                  style={{
+                    color: "white",
+                  }}
+                  onClick={learnHandler}
+                >
+                  Learn
+                </button>
               </div>
             </Card>
           </div>
@@ -176,6 +217,7 @@ function App() {
                   Left
                 </button>
                 <div className="btn-group-vertical">
+                  {/* Forward */}
                   <button
                     type="button"
                     className="btn btn-primary btn-outline-danger my-3 btn-lg"
@@ -186,6 +228,18 @@ function App() {
                   >
                     Forward
                   </button>
+                  {/* Break */}
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                    style={{
+                      color: "white",
+                    }}
+                    onClick={breakHandler}
+                  >
+                    Break
+                  </button>
+                  {/* back */}
                   <button
                     type="button"
                     className="btn btn-primary btn-outline-danger my-3 btn-lg"
@@ -214,21 +268,12 @@ function App() {
           {/* Rotate Section */}
           <div className="col-sm">
             <Card className="border border-primary">
-              Controls
+              Claws
               <div
                 className="btn-group"
                 role="group"
                 aria-label="Basic example"
               >
-                <button
-                  type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Rotate Left
-                </button>
                 <div className="btn-group-vertical">
                   <button
                     type="button"
@@ -236,8 +281,9 @@ function App() {
                     style={{
                       color: "white",
                     }}
+                    onClick={clawOnHandler}
                   >
-                    Claw On
+                    Open
                   </button>
                   <button
                     type="button"
@@ -245,19 +291,11 @@ function App() {
                     style={{
                       color: "white",
                     }}
+                    onClick={clawOffHandler}
                   >
-                    Claw Off
+                    Close
                   </button>
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Rotate Right
-                </button>
               </div>
             </Card>
           </div>
