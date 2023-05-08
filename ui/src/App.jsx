@@ -24,6 +24,7 @@ function App() {
   function handle() {
     id = idValue;
     console.log(id);
+    alert("Bot Changed");
   }
 
   const radioButtonClicked = (e) => {
@@ -114,22 +115,24 @@ function App() {
   };
 
   return (
-    <>
-      <nav className="navbar navbar-dark bg-primary mb-3">RuneStone GroupG</nav>
+    <Container data-bs-theme="light">
+      <nav className="navbar navbar-dark bg-warning text-dark mb-3">
+        RuneStone GroupG
+      </nav>
 
-      <Container className="container-fluid mb-2 w-50 p-3">
+      <Container className="container container-sm mb-2 w-50 p-3">
         <div className="row">
           {/* Robot Selection Panel */}
-          <div className="col-sm">
-            <Card className="border border-primary">
+          <div className="col-sm h-25 d-flex justify-content-start">
+            <Card className="border border-warning bg-dark text-white">
               <form class="form-inline">
                 <div class="form-group">
-                  <label for="inputRobot" class="sr-only">
+                  <label for="inputRobot" className="sr-only">
                     Enter the Bot ID
                   </label>
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control form-control-sm bg-dark text-white"
                     id="inputRobot"
                     placeholder="Bot id"
                     value={idValue}
@@ -140,7 +143,7 @@ function App() {
                 </div>
                 <button
                   type="button"
-                  class="btn btn-primary mt-2"
+                  className="btn btn-warning text-dark btn-sm m-1"
                   onClick={handle}
                 >
                   Confirm
@@ -150,17 +153,17 @@ function App() {
           </div>
 
           {/* Power Mode */}
-          <div className="col-sm">
-            <Card className="border border-primary">
+          <div className="col-sm h-25 d-flex justify-content-start">
+            <Card className="border border-warning bg-dark text-white">
               Mode
               <div
-                className="btn-group"
+                className="btn-group btn-group-sm btn-group-vertical"
                 role="group"
                 aria-label="Basic example"
               >
                 <button
                   type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
+                  className="btn btn-warning text-dark btn-outline-danger mx-1 btn-lg"
                   style={{
                     color: "white",
                   }}
@@ -170,18 +173,18 @@ function App() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
+                  className="btn btn-warning text-dark btn-outline-danger mx-1 btn-lg"
                   style={{
                     color: "white",
                   }}
                   onClick={stopHandler}
                 >
-                  Automatic Control
+                  Automatic
                 </button>
                 {/* Learn */}
                 <button
                   type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
+                  className="btn btn-warning text-dark btn-outline-danger mx-1 btn-lg"
                   style={{
                     color: "white",
                   }}
@@ -199,7 +202,7 @@ function App() {
         <div className="row">
           {/* Movement Control */}
           <div className="col-sm">
-            <Card className="border border-primary">
+            <Card className="border border-warning bg-dark text-white">
               Controls
               <div
                 className="btn-group"
@@ -208,7 +211,7 @@ function App() {
               >
                 <button
                   type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
+                  className="btn btn-warning text-dark btn-outline-danger mx-1 btn-lg"
                   style={{
                     color: "white",
                   }}
@@ -220,7 +223,7 @@ function App() {
                   {/* Forward */}
                   <button
                     type="button"
-                    className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                    className="btn btn-warning text-dark btn-outline-danger my-3 btn-lg"
                     style={{
                       color: "white",
                     }}
@@ -231,7 +234,7 @@ function App() {
                   {/* Break */}
                   <button
                     type="button"
-                    className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                    className="btn btn-warning text-dark btn-outline-danger my-3 btn-lg"
                     style={{
                       color: "white",
                     }}
@@ -242,7 +245,7 @@ function App() {
                   {/* back */}
                   <button
                     type="button"
-                    className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                    className="btn btn-warning text-dark btn-outline-danger my-3 btn-lg"
                     style={{
                       color: "white",
                     }}
@@ -253,7 +256,7 @@ function App() {
                 </div>
                 <button
                   type="button"
-                  className="btn btn-primary btn-outline-danger mx-1 btn-lg"
+                  className="btn btn-warning text-dark btn-outline-danger mx-1 btn-lg"
                   style={{
                     color: "white",
                   }}
@@ -267,7 +270,7 @@ function App() {
 
           {/* Rotate Section */}
           <div className="col-sm">
-            <Card className="border border-primary">
+            <Card className="border border-warning bg-dark text-white">
               Claws
               <div
                 className="btn-group"
@@ -277,7 +280,7 @@ function App() {
                 <div className="btn-group-vertical">
                   <button
                     type="button"
-                    className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                    className="btn btn-warning text-dark btn-outline-danger my-3 btn-lg"
                     style={{
                       color: "white",
                     }}
@@ -287,7 +290,7 @@ function App() {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-primary btn-outline-danger my-3 btn-lg"
+                    className="btn btn-warning text-dark btn-outline-danger my-3 btn-lg"
                     style={{
                       color: "white",
                     }}
@@ -301,7 +304,7 @@ function App() {
           </div>
           {/* Liive Stream */}
           <div className="col-sm">
-            <Card className="border border-primary">
+            <Card className="border border-warning bg-dark text-white">
               Youtube Live
               <div className="embed-responsive embed-responsive-1by1">
                 <iframe
@@ -315,7 +318,7 @@ function App() {
           </div>
         </div>
       </Container>
-    </>
+    </Container>
   );
 }
 
