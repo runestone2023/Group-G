@@ -152,7 +152,7 @@ function App() {
           {/* Power Mode */}
           <div className="col-sm">
             <Card className="border border-primary">
-              Power
+              Mode
               <div
                 className="btn-group"
                 role="group"
@@ -166,7 +166,7 @@ function App() {
                   }}
                   onClick={startHandler}
                 >
-                  Turn On
+                  Manuel
                 </button>
                 <button
                   type="button"
@@ -176,7 +176,7 @@ function App() {
                   }}
                   onClick={stopHandler}
                 >
-                  Turn Off
+                  Automatic Control
                 </button>
                 {/* Learn */}
                 <button
