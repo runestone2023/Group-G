@@ -19,18 +19,28 @@ function App() {
   const [desc, setDesc] = useState("");
   const [now, setNow] = useState("");
   const [idValue, setId] = useState("");
-  let id = 0;
+  const [bots, setBots] = useState([]);
 
-  function handle() {
-    id = idValue;
+  let id = 0;
+  let speed = 10;
+
+  function selectBot(botId) {
+    id = botId;
     console.log(id);
-    alert("Bot Changed");
+    // alert("Bot Changed");
   }
 
-  const radioButtonClicked = (e) => {
-    // setId(e.target.value);
-    id = e.target.value;
-    console.log(id);
+  function selectBotSpeed(botSpeed) {
+    speed = botSpeed;
+    console.log(speed);
+    // alert("Bot Changed");
+  }
+
+  const getHandle = () => {
+    axios
+      .get(`http://localhost:8000/clients`)
+      // .then(() => console.log(res.data))
+      .then((res) => setBots(res.data));
   };
 
   const startHandler = () => {
@@ -54,12 +64,14 @@ function App() {
   };
 
   // move forward
+
   const moveForwardHandler = () => {
     axios
       .post(`http://localhost:8000/clients/${id}/move`, {
-        speed: 100,
+        speed: speed,
       })
-      .then((res) => console.log(res.data, res));
+      .then((res) => console.log(res.data));
+    console.log("this is sppe", speed);
   };
 
   // break
@@ -125,30 +137,52 @@ function App() {
           {/* Robot Selection Panel */}
           <div className="col-sm h-25 d-flex justify-content-start">
             <Card className="border border-warning bg-dark text-white">
-              <form class="form-inline">
-                <div class="form-group">
+              <form className="form-inline">
+                <div className="form-group">
                   <label for="inputRobot" className="sr-only">
-                    Enter the Bot ID
+                    Select Bot
                   </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm bg-dark text-white"
-                    id="inputRobot"
-                    placeholder="Bot id"
-                    value={idValue}
-                    onChange={(e) => {
-                      setId(e.target.value);
-                    }}
-                  />
                 </div>
+
                 <button
                   type="button"
-                  className="btn btn-warning text-dark btn-sm m-1"
-                  onClick={handle}
+                  className="btn btn-warning text-dark  m-1"
+                  onClick={getHandle}
                 >
-                  Confirm
+                  SCAN
                 </button>
               </form>
+              {bots.length > 0 && (
+                <div
+                  className="btn-group btn-group-toggle"
+                  data-toggle="buttons"
+                >
+                  <ul className="mx-auto justify-content-center">
+                    {bots.map((bot) => (
+                      <label className="btn btn-outline-secondary btn-sm m-1 active">
+                        <input
+                          type="radio"
+                          // className="btn btn-sm m-1"
+                          name="options"
+                          // data-toggle="button"
+                          // aria-pressed="false"
+                          id={bot.botId}
+                          key={bot.botId}
+                          autoComplete="off"
+                          value={bot.botId}
+                          onClick={(e) => {
+                            selectBot(e.target.value);
+                            // selectBot();
+                          }}
+                          // checked
+                          // onClick={selectBot}
+                        />
+                        {bot.botName}
+                      </label>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </Card>
           </div>
 
@@ -264,6 +298,56 @@ function App() {
                 >
                   Right
                 </button>
+              </div>
+            </Card>
+          </div>
+
+          <div className="col-sm">
+            <Card className="border border-warning bg-dark text-white">
+              Speed
+              <div
+                className="btn-group-vertical btn-group-toggle btn-group-sm"
+                data-toggle="buttons"
+              >
+                <label className="btn btn-outline-secondary active">
+                  <input
+                    type="radio"
+                    name="Speed"
+                    id="speedOptions1"
+                    autoComplete="off"
+                    value={"10"}
+                    onClick={(e) => {
+                      selectBotSpeed(e.target.value);
+                    }}
+                  />
+                  Slow
+                </label>
+                <label className="btn btn-secondary">
+                  <input
+                    type="radio"
+                    name="Speed"
+                    id="speedOptions2"
+                    autoComplete="off"
+                    value={"50"}
+                    onClick={(e) => {
+                      selectBotSpeed(e.target.value);
+                    }}
+                  />
+                  Medium
+                </label>
+                <label className="btn btn-secondary">
+                  <input
+                    type="radio"
+                    name="Speed"
+                    id="speedOptions3"
+                    autoComplete="off"
+                    value={"100"}
+                    onClick={(e) => {
+                      selectBotSpeed(e.target.value);
+                    }}
+                  />
+                  Fast
+                </label>
               </div>
             </Card>
           </div>
