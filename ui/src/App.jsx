@@ -23,6 +23,8 @@ function App() {
 
   let id = 0;
   let speed = 10;
+  let positiveAngle = 45;
+  let negativeAngle = -45;
 
   function selectBot(botId) {
     id = botId;
@@ -33,6 +35,13 @@ function App() {
   function selectBotSpeed(botSpeed) {
     speed = botSpeed;
     console.log(speed);
+    // alert("Bot Changed");
+  }
+
+  function selectClawAngle(clawAngle) {
+    positiveAngle = clawAngle;
+    negativeAngle = -clawAngle;
+    console.log(positiveAngle, negativeAngle);
     // alert("Bot Changed");
   }
 
@@ -95,7 +104,7 @@ function App() {
   const moveLeftHandler = () => {
     axios
       .post(`http://localhost:8000/clients/${id}/rotate`, {
-        angle: -45,
+        angle: negativeAngle,
       })
       .then((res) => console.log(res.data, res));
   };
@@ -103,7 +112,7 @@ function App() {
   const moveRightHandler = () => {
     axios
       .post(`http://localhost:8000/clients/${id}/rotate`, {
-        angle: 45,
+        angle: positiveAngle,
       })
       .then((res) => console.log(res.data, res));
   };
@@ -128,8 +137,17 @@ function App() {
 
   return (
     <Container data-bs-theme="light">
-      <nav className="navbar navbar-dark bg-warning text-dark mb-3">
+      <nav
+        className="navbar navbar-dark bg-warning text-dark rounded-bottom"
+        style={{ justifyContent: "center" }}
+      >
+        <a class="navbar-brand">
+          <img src="src/assets/uu.png" width="30" height="30" alt="" />
+        </a>
         RuneStone GroupG
+        <a class="navbar-brand mx-3">
+          <img src="src/assets/han.png" width="30" height="30" alt="" />
+        </a>
       </nav>
 
       <Container className="container container-sm mb-2 w-50 p-3">
@@ -146,7 +164,7 @@ function App() {
 
                 <button
                   type="button"
-                  className="btn btn-warning text-dark  m-1"
+                  className="btn btn-warning text-dark btn-outline-danger  m-1"
                   onClick={getHandle}
                 >
                   SCAN
@@ -166,10 +184,10 @@ function App() {
                           name="options"
                           // data-toggle="button"
                           // aria-pressed="false"
-                          id={bot.botId}
-                          key={bot.botId}
+                          id={bot}
+                          key={bot}
                           autoComplete="off"
-                          value={bot.botId}
+                          value={bot}
                           onClick={(e) => {
                             selectBot(e.target.value);
                             // selectBot();
@@ -177,7 +195,7 @@ function App() {
                           // checked
                           // onClick={selectBot}
                         />
-                        {bot.botName}
+                        {bot}
                       </label>
                     ))}
                   </ul>
@@ -349,10 +367,26 @@ function App() {
                   Fast
                 </label>
               </div>
+              Angle
+              <div class="col-xs-2">
+                <input
+                  class="form-control"
+                  id="angle"
+                  type="number"
+                  style={{
+                    backgroundColor: "#212529",
+                    color: "white",
+                  }}
+                  min={1}
+                  onChange={(e) => {
+                    selectClawAngle(e.target.value);
+                  }}
+                />
+              </div>
             </Card>
           </div>
 
-          {/* Rotate Section */}
+          {/* Claw Section */}
           <div className="col-sm">
             <Card className="border border-warning bg-dark text-white">
               Claws
