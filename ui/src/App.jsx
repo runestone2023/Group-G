@@ -87,7 +87,7 @@ function App() {
   const moveBackHandler = () => {
     axios
       .post(`http://localhost:8000/clients/${id}/move`, {
-        speed: -100,
+        speed: -speed,
       })
       .then((res) => console.log(res.data, res));
   };

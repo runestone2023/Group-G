@@ -14,7 +14,7 @@ from simple_pid import PID
 from RobotCommunicator import RobotCommunicatorClient
 import time
 
-HOST = '10.42.0.1'
+HOST = '192.168.0.2'
 PORT = 65530
 
 rotate_angle_factor = 2.39
@@ -92,6 +92,7 @@ def learn_angle_pid(iterations):
 
 
 if __name__ == "__main__":
+
     robot_comm=RobotCommunicatorClient(HOST, PORT)
     motors=MoveSteering(OUTPUT_B, OUTPUT_C, motor_class=LargeMotor)
     motors.gyro=GyroSensor()
