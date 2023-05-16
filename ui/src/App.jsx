@@ -22,7 +22,7 @@ function App() {
   const [bots, setBots] = useState([]);
 
   let id = 0;
-  let speed = 10;
+  let speed = 50;
   let positiveAngle = 45;
   let negativeAngle = -45;
 
