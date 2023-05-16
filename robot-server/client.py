@@ -23,6 +23,7 @@ max_distance_us = 100
 steer_speed = SpeedPercent(40)
 gyro_offset = 10
 
+
 class AngleLearner:
     def __init__(self):
         self.angle = 45
@@ -39,6 +40,8 @@ class AngleLearner:
 def move_forward(speed, motors):
     motors.on(0, speed)
 
+def move_forward_distance(speed, distance, motors):
+    motors.on_for_rotations(0, speed, distance / (3.14 * 5.6))
 
 def steer(angle, motors):
     motors.gyro.reset()
@@ -114,7 +117,15 @@ if __name__ == "__main__":
         command=msg.get("command")
         print("Received command: ", command)
         if command == "move_forward":
+            if msg.get("speed") == 0:
+                print("Travelled distance", ((motors.position - initial_position) / 360) * ())
+            else:
+                initial_position = motors.position
             move_forward(msg.get("speed"), motors)
+
+        elif command == "move_forward_distance":
+            move_forward_distance(msg.get("speed"), msg.get("distance"), motors)
+            robot_comm.send_message({"distance": msg.get("distance"), "angle": motors.gyro.angle})
 
         elif command == "rotate":
             steer(msg.get("angle"), motors)
