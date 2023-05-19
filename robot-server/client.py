@@ -22,6 +22,7 @@ max_distance_us = 100
 
 steer_speed = SpeedPercent(40)
 gyro_offset = 10
+cumulative_angle = 0
 
 
 class AngleLearner:
@@ -55,6 +56,9 @@ def steer(angle, motors):
     motors.on(0, 0)
 
     time.sleep(0.5)
+
+    global cumulative_angle
+    cumulative_angle += motors.gyro.angle
 
 def learn_angle_pid(iterations):
     angle_learner = AngleLearner()
@@ -125,8 +129,9 @@ if __name__ == "__main__":
 
         elif command == "move_forward_distance":
             move_forward_distance(msg.get("speed"), msg.get("distance"), motors)
-            robot_comm.send_message({"distance": msg.get("distance"), "angle": motors.gyro.angle})
+            robot_comm.send_message({"distance": msg.get("distance"), "angle": cumulative_angle})
             motors.gyro.reset()
+            cumulative_angle = 0
 
         elif command == "rotate":
             steer(msg.get("angle"), motors)
