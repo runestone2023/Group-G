@@ -24,6 +24,8 @@ robot_server = RobotCommunicatorServer('', PORT)
 robot_server.start()
 
 map = Map(500, 500)
+map_renderer = MapRenderer(500, 500)
+cumulative_angle = 0
 
 
 @app.get("/clients")
@@ -52,11 +54,16 @@ async def send_move(client_id: int, body: MoveDistCmd):
         pass
     res = robot_server._recv_messages.pop(0)
 
-    if body.speed < 0:
-        res['angle'] = 180 - res['angle']
+    global cumulative_angle
+    cumulative_angle += res['angle']
 
-    map.update_current_location(res['distance'], res['angle'])
+    if body.speed < 0:
+        res['distance'] *= -1
+
+    map.update_current_location(res['distance'], cumulative_angle)
     print("Current location: ", map.current_location)
+
+    map_renderer.render([], map.robot_path)
     
     return {"client_id": client_id, 'move_forward_distance': res}
 

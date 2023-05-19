@@ -14,7 +14,7 @@ from simple_pid import PID
 from RobotCommunicator import RobotCommunicatorClient
 import time
 
-HOST = '192.168.0.2'
+HOST = '192.168.0.3'
 PORT = 65530
 
 rotate_angle_factor = 2.39
@@ -117,15 +117,16 @@ if __name__ == "__main__":
         command=msg.get("command")
         print("Received command: ", command)
         if command == "move_forward":
-            if msg.get("speed") == 0:
-                print("Travelled distance", ((motors.position - initial_position) / 360) * ())
-            else:
-                initial_position = motors.position
+            # if msg.get("speed") == 0:
+            #     print("Travelled distance", ((motors.position - initial_position) / 360) * ())
+            # else:
+            #     initial_position = motors.position
             move_forward(msg.get("speed"), motors)
 
         elif command == "move_forward_distance":
             move_forward_distance(msg.get("speed"), msg.get("distance"), motors)
             robot_comm.send_message({"distance": msg.get("distance"), "angle": motors.gyro.angle})
+            motors.gyro.reset()
 
         elif command == "rotate":
             steer(msg.get("angle"), motors)
