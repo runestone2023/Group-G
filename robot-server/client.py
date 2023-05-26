@@ -5,7 +5,7 @@ import time
 
 from ev3dev2.motor import (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, LargeMotor,
                            MediumMotor, MoveSteering, SpeedPercent)
-from ev3dev2.sensor.lego import UltrasonicSensor, GyroSensor
+from ev3dev2.sensor.lego import UltrasonicSensor, GyroSensor, ColorSensor
 from ev3dev2.sound import Sound
 
 from simple_pid import PID
@@ -16,6 +16,9 @@ import time
 
 HOST = '192.168.0.3'
 PORT = 65530
+
+is_automatic = False 
+has_anything_in_claw = False
 
 rotate_angle_factor = 2.39
 max_distance_us = 100
@@ -104,8 +107,10 @@ if __name__ == "__main__":
     motors=MoveSteering(OUTPUT_B, OUTPUT_C, motor_class=LargeMotor)
     motors.gyro=GyroSensor()
     motors.gyro.calibrate()
+    color_sensor=ColorSensor()
 
     claw=MediumMotor(OUTPUT_D)
+    # us = UltrasonicSensor()
 
 
     sound=Sound()
@@ -114,12 +119,32 @@ if __name__ == "__main__":
 
     sound.beep()
     while True:
+
+        print(is_automatic)
+        if is_automatic:
+            # distance = us.distance_centimeters
+            if color_sensor.color == ColorSensor.COLOR_RED:
+                move_forward_distance(-10, 5, motors)
+                claw.on_for_rotations(60, 3)
+                has_anything_in_claw = True
+
+
+            
+            # if distance <= max_distance_us:
+            #     # robot_comm.send_message({"distance": distance, "type": "obs"})
+            #     steer(-90, motors)
+                
+            # else:
+            #     # robot_comm.send_message({"distance": distance, "type": "free"})
+            #     move_forward(100, motors)
+                
         msg=robot_comm.pop_message()
         if not msg:
             continue
 
         command=msg.get("command")
         print("Received command: ", command)
+
         if command == "move_forward":
             # if msg.get("speed") == 0:
             #     print("Travelled distance", ((motors.position - initial_position) / 360) * ())
@@ -142,6 +167,10 @@ if __name__ == "__main__":
         elif command == "claw":
             grab=msg.get("grab")
             claw.on_for_rotations(100 if grab else -100, 1)
+
+        elif command == "automatic":
+            automatic_status = msg.get("automatic")
+            is_automatic = automatic_status
 
         elif command == "scan":
             us = UltrasonicSensor()

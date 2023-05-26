@@ -5,7 +5,7 @@ import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from RobotCommunicator import RobotCommunicatorServer
-from models import MoveCmd, RotateCmd, ClawCmd, LearnCmd, MoveDistCmd
+from models import MoveCmd, RotateCmd, ClawCmd, LearnCmd, MoveDistCmd, AutomaticCmd
 from mapping import Map, Observation, MapRenderer
 
 PORT = 65530
@@ -84,6 +84,12 @@ async def send_claw(client_id: int, body: ClawCmd ):
     res = robot_server.send_message(
             {'command': 'claw', 'grab' : body.grab}, client_id)
     return {"client_id": client_id, 'beep': res}
+
+@app.post("/clients/{client_id}/automatic")
+async def send_claw(client_id: int, body: AutomaticCmd ):
+    res = robot_server.send_message(
+            {'command': 'automatic', 'automatic': body.automatic}, client_id)
+    return {"client_id": client_id, 'automatic': res}
 
 @app.post("/clients/{client_id}/scan")
 async def send_scan(client_id: int):

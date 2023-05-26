@@ -15,3 +15,6 @@ class ClawCmd(BaseModel):
 
 class LearnCmd(BaseModel):
     iters: int
+
+class AutomaticCmd(BaseModel):
+    automatic: bool
