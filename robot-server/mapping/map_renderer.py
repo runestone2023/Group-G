@@ -1,6 +1,8 @@
 from mapping.observation import Observation
 from mapping.enums import ObservationType
 import matplotlib.pyplot as plt
+import io
+import base64
 
 class MapRenderer:
     """
@@ -34,5 +36,7 @@ class MapRenderer:
         # Plot the robot
         ax.scatter(robot_path[-1][0], robot_path[-1][1], color='blue')
 
-        # Show the plot
-        plt.show()
+        img_bytes = io.BytesIO()
+        plt.savefig(img_bytes, format='png')
+        img_bytes.seek(0)
+        return base64.b64encode(img_bytes.read())

@@ -63,9 +63,13 @@ async def send_move(client_id: int, body: MoveDistCmd):
     map.update_current_location(res['distance'], cumulative_angle)
     print("Current location: ", map.current_location)
 
-    map_renderer.render([], map.robot_path)
     
     return {"client_id": client_id, 'move_forward_distance': res}
+
+@app.get("/clients/{client_id}/map")
+async def get_map(client_id: int):
+    png = map_renderer.render([], map.robot_path)
+    return { "image": png }
 
 @app.post("/clients/{client_id}/rotate")
 async def send_rotate(client_id: int, body: RotateCmd):
