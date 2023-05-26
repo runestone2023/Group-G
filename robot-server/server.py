@@ -21,11 +21,17 @@ app.add_middleware(
 )
 
 robot_server = RobotCommunicatorServer('', PORT)
-robot_server.start()
 
-map = Map(500, 500)
+maps = {}
+cumulative_angle: dict[int, int] = {}
+
+def add_map_hook(id):
+    maps[id] = Map(500, 500)
+    cumulative_angle[id] = 0
+
+robot_server.register_on_connect(add_map_hook)
 map_renderer = MapRenderer(500, 500)
-cumulative_angle = 0
+robot_server.start()
 
 
 @app.get("/clients")
@@ -46,7 +52,7 @@ async def send_move(client_id: int, body: MoveCmd):
     return {"client_id": client_id, 'move_forward': res}
 
 @app.post("/clients/{client_id}/move_distance")
-async def send_move(client_id: int, body: MoveDistCmd):
+async def send_move_distance(client_id: int, body: MoveDistCmd):
     res = robot_server.send_message(
         {'command': 'move_forward_distance', 'speed': body.speed, 'distance': body.distance}, client_id)
     while robot_server._recv_messages == []:
@@ -60,12 +66,16 @@ async def send_move(client_id: int, body: MoveDistCmd):
     if body.speed < 0:
         res['distance'] *= -1
 
-    map.update_current_location(res['distance'], cumulative_angle)
-    print("Current location: ", map.current_location)
+    maps[client_id].update_current_location(res['distance'], cumulative_angle[client_id])
+    print("Current location: ", maps[client_id].current_location)
 
-    map_renderer.render([], map.robot_path)
     
     return {"client_id": client_id, 'move_forward_distance': res}
+
+@app.get("/clients/{client_id}/map")
+async def get_map(client_id: int):
+    png = map_renderer.render([], maps[client_id].robot_path)
+    return { "image": png }
 
 @app.post("/clients/{client_id}/rotate")
 async def send_rotate(client_id: int, body: RotateCmd):
