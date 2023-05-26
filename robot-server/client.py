@@ -120,16 +120,14 @@ if __name__ == "__main__":
     sound.beep()
     while True:
 
-        print(is_automatic)
         if is_automatic:
             # distance = us.distance_centimeters
-            if color_sensor.color == ColorSensor.COLOR_RED:
+            if color_sensor.color == ColorSensor.COLOR_RED and not has_anything_in_claw:
                 move_forward_distance(-10, 5, motors)
-                claw.on_for_rotations(60, 3)
+                claw.on_for_rotations(60, 5)
                 has_anything_in_claw = True
+                robot_comm.send_message({"command": "grabbed_item", "sender": 0})
 
-
-            
             # if distance <= max_distance_us:
             #     # robot_comm.send_message({"distance": distance, "type": "obs"})
             #     steer(-90, motors)
@@ -171,6 +169,18 @@ if __name__ == "__main__":
         elif command == "automatic":
             automatic_status = msg.get("automatic")
             is_automatic = automatic_status
+
+        elif command == "go_origin":
+            sound.beep()
+            steer(msg.get("angle"), motors)
+            move_forward_distance(60, msg.get("distance"), motors)
+            robot_comm.send_message({"distance": msg.get("distance"), "angle": cumulative_angle})
+            motors.gyro.reset()
+            cumulative_angle = 0
+
+        elif command == "drop_item":
+            claw.on_for_rotations(60, -5)
+            has_anything_in_claw = False
 
         elif command == "scan":
             us = UltrasonicSensor()

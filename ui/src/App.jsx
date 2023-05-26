@@ -59,20 +59,20 @@ function App() {
 
   const mapImgHandle = () => {
     axios
-      .get(`http://localhost:8000/clients/1/map`)
+      .get(`http://localhost:8000/clients/${id}/map`)
       // .then((res) => console.log(res.data.image));
       .then((res) => setImage(res.data.image));
   };
 
   const startHandler = () => {
     axios
-      .post("http://localhost:8000/start/")
+      .post(`http://localhost:8000/clients/${id}/automatic`, {"automatic": false})
       .then((res) => console.log(res.data, res));
   };
 
   const stopHandler = () => {
     axios
-      .post("http://localhost:8000/stop/")
+      .post(`http://localhost:8000/clients/${id}/automatic`, {"automatic": true})
       .then((res) => console.log(res.data, res));
   };
 

@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from RobotCommunicator import RobotCommunicatorServer
 from models import MoveCmd, RotateCmd, ClawCmd, LearnCmd, MoveDistCmd, AutomaticCmd
 from mapping import Map, Observation, MapRenderer
+from math import atan, degrees, hypot
 
 PORT = 65530
 
@@ -61,7 +62,7 @@ async def send_move_distance(client_id: int, body: MoveDistCmd):
     res = robot_server._recv_messages.pop(0)
 
     global cumulative_angle
-    cumulative_angle += res['angle']
+    cumulative_angle[client_id] += res['angle']
 
     if body.speed < 0:
         res['distance'] *= -1
@@ -118,6 +119,44 @@ async def send_learn(client_id: int, body: LearnCmd):
     return {"client_id": client_id, 'learn_result': res}
 
 
+def go_origin(sender):
+        global cumulative_angle
+
+        return_vector = (0 - maps[sender].current_location[0], 0 - maps[sender].current_location[1]) 
+        vector_horizontal_angle = degrees(atan(return_vector[1] / return_vector[0]))
+
+        return_angle = 180 - abs(vector_horizontal_angle - cumulative_angle[sender])
+
+        return_distance = hypot(maps[sender].current_location[0], maps[sender].current_location[1])
+
+        print("Cumulative: ", cumulative_angle[sender], "Angle to origin: ", return_angle, "Return Distance: ", return_distance)
+
+        return_angle = return_angle if cumulative_angle[sender] > 0 else -return_angle
+
+        if (maps[sender].current_location[0] < 0):
+            return_angle = 180 - return_angle
+            
+        robot_server.send_message({'command': 'go_origin', 'angle': return_angle if cumulative_angle[sender] > 0 else -return_angle, 'distance': return_distance}, sender)
+
+        while robot_server._recv_messages == []:
+            print("Waiting for answer")
+        pass
+        
+        res = robot_server._recv_messages.pop(0)
+
+        cumulative_angle[sender] += res['angle']
+
+        maps[sender].update_current_location(res['distance'], cumulative_angle[sender])
+        print("Current location: ", maps[sender].current_location)
+
+        diff_from_origin = (0 - maps[sender].current_location[0], 0 - maps[sender].current_location[1])
+        
+        if (hypot(diff_from_origin[0], diff_from_origin[1]) > 10):
+            go_origin(sender)
+            # res = robot_server.send_message({'command': 'drop_item'}, sender)
+        else:
+            res = robot_server.send_message({'command': 'drop_item'}, sender)
+
 # Event loop for communicatimg with robots
 def event_loop():
     while True:
@@ -130,5 +169,9 @@ def event_loop():
         command = msg.get("command")
         sender = msg.get("sender")
 
-        # if command == ..
+        if command == "grabbed_item":
+            go_origin(sender)
+
+            
+
 _thread.start_new_thread(event_loop,())
