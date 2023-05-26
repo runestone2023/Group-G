@@ -33,6 +33,19 @@ robot_server.register_on_connect(add_map_hook)
 map_renderer = MapRenderer(500, 500)
 robot_server.start()
 
+# Event loop for communicatimg with robots
+while True:
+    msg = robot_server.pop_message()
+    time.sleep(0.05)
+
+    if not msg:
+        continue
+
+    command = msg.get("command")
+    command = msg.get("sender")
+
+    # if command == ..
+
 
 @app.get("/clients")
 async def clients():
