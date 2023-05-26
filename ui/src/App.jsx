@@ -84,10 +84,10 @@ function App() {
       .then((res) => console.log(res.data, res));
   };
 
-  // move handler
+  // distance handler
   const distanceHandler = () => {
     axios
-      .post(`http://localhost:8000/clients/1/move_distance`, {
+      .post(`http://localhost:8000/clients/${id}/move_distance`, {
         speed: 40,
         distance: distance,
       })
