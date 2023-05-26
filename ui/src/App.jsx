@@ -327,7 +327,7 @@ function App() {
                 className="btn-group-vertical btn-group-toggle btn-group-sm"
                 data-toggle="buttons"
               >
-                <label className="btn btn-outline-secondary active">
+                <label className="btn btn-outline-secondary active bg-dark">
                   <input
                     type="radio"
                     name="Speed"
@@ -338,9 +338,9 @@ function App() {
                       selectBotSpeed(e.target.value);
                     }}
                   />
-                  Slow
+                  SLOW
                 </label>
-                <label className="btn btn-secondary">
+                <label className="btn btn-secondary bg-dark">
                   <input
                     type="radio"
                     name="Speed"
@@ -351,9 +351,9 @@ function App() {
                       selectBotSpeed(e.target.value);
                     }}
                   />
-                  Medium
+                  MEDIUM
                 </label>
-                <label className="btn btn-secondary">
+                <label className="btn btn-secondary bg-dark">
                   <input
                     type="radio"
                     name="Speed"
@@ -364,7 +364,7 @@ function App() {
                       selectBotSpeed(e.target.value);
                     }}
                   />
-                  Fast
+                  FAST
                 </label>
               </div>
               Angle
@@ -390,7 +390,7 @@ function App() {
           <div className="col-sm">
             <Card className="border border-warning bg-dark text-white">
               Claws
-              <div
+              {/* <div
                 className="btn-group"
                 role="group"
                 aria-label="Basic example"
@@ -417,23 +417,36 @@ function App() {
                     Close
                   </button>
                 </div>
-              </div>
+              </div> */}
+              <button
+                className="btn btn-warning btn-outline-danger text-dark m-2"
+                onClick={clawOnHandler}
+              >
+                Up
+              </button>
+              <button
+                className="btn btn-warning btn-outline-danger text-dark m-2"
+                onClick={clawOffHandler}
+              >
+                Down
+              </button>
             </Card>
           </div>
           {/* Liive Stream */}
-          <div className="col-sm">
+          {/* <div className="col-sm">
             <Card className="border border-warning bg-dark text-white">
               Youtube Live
               <div className="embed-responsive embed-responsive-1by1">
                 <iframe
                   className="embed-responsive-item"
                   // src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0"
-                  src="https://www.youtube.com/embed/HsLqiShzP0k?rel=0"
+                  // src="https://www.youtube.com/embed/HsLqiShzP0k?rel=0"
+                  src="https://youtube.com/live/bosNdn6iJAI?feature=share"
                   allowFullScreen
                 ></iframe>
               </div>
             </Card>
-          </div>
+          </div> */}
         </div>
       </Container>
     </Container>
