@@ -59,12 +59,17 @@ class RobotCommunicator:
 class RobotCommunicatorServer(RobotCommunicator):
     def __init__(self, ip, port):
         super().__init__(ip, port)
+        self._on_connect_hooks = []
 
     def start(self):
         tid = _thread.start_new_thread(robot_tcp_server, (self.port,
                                                           self._send_queue,
                                                           self._connected_clients,
-                                                          self._recv_messages.append,))
+                                                          self._recv_messages.append,
+                                                          self._on_connect_hooks))
+    def register_on_connect(self, func):
+        self._on_connect_hooks.append(func)
+
 
     def list_clients(self):
         return list(self._connected_clients)
@@ -140,7 +145,8 @@ def robot_tcp_client(host, port, message_queue, connected_clients, handle_messag
                      connected_clients, handle_message)
 
 
-def robot_tcp_server(port, message_queue: list, connected_clients, handle_response):
+def robot_tcp_server(port, message_queue: list, connected_clients,
+                     handle_response, on_connect):
     recv_queue = []
     sel = selectors.DefaultSelector()
 
@@ -156,6 +162,10 @@ def robot_tcp_server(port, message_queue: list, connected_clients, handle_respon
             for key, mask in events:
                 if key.data is None:
                     accept_connection(key.fileobj, sel, connected_clients)
+
+                    for func in on_connect:
+                        func(max(connected_clients.keys()))
+
                 else:
                     service_connection(
                         key, mask, sel, message_queue, recv_queue, connected_clients)
