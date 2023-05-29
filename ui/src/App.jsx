@@ -58,6 +58,7 @@ function App() {
   };
 
   const mapImgHandle = () => {
+    console.log("map image");
     axios
       .get(`http://localhost:8000/clients/${id}/map`)
       // .then((res) => console.log(res.data.image));
@@ -114,6 +115,8 @@ function App() {
         speed: 0,
       })
       .then((res) => console.log(res.data, res));
+
+      mapImgHandle();
   };
 
   // back

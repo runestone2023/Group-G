@@ -99,7 +99,7 @@ async def send_claw(client_id: int, body: ClawCmd ):
 @app.post("/clients/{client_id}/automatic")
 async def send_claw(client_id: int, body: AutomaticCmd ):
     res = robot_server.send_message(
-            {'command': 'automatic', 'automatic': body.automatic}, client_id)
+            {'command': 'automatic', 'automatic': body.automatic, 'position': maps[client_id].current_location}, client_id)
     return {"client_id": client_id, 'automatic': res}
 
 @app.post("/clients/{client_id}/scan")
@@ -167,10 +167,26 @@ def event_loop():
             continue
 
         command = msg.get("command")
-        sender = msg.get("sender")
+        print(robot_server._connected_clients.keys(), robot_server._connected_clients.values())
+        print([robot_server._connected_clients[id][0] for id in robot_server._connected_clients.keys()])
+        sender = [id for id in robot_server._connected_clients.keys() if robot_server._connected_clients[id][0] == msg.get('addr')[0]][0]
 
         if command == "grabbed_item":
             go_origin(sender)
+        
+        elif command == "update_map":
+            print("UPDATING MAP RIGHT NOW")
+            global cumulative_angle
+            cumulative_angle[sender] += msg.get('angle')
+
+            # if body.speed < 0:
+                # res['distance'] *= -1
+
+            maps[sender].update_current_location(msg.get('distance'), cumulative_angle[sender])
+            print("Current location: ", maps[sender].current_location)
+
+        elif command == "give_location":
+            res = robot_server.send_message({'command': 'give_location', 'location': maps[sender].current_location}, sender)
 
             
 

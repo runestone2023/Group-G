@@ -36,6 +36,12 @@ class MapRenderer:
         # Plot the robot
         ax.scatter(robot_path[-1][0], robot_path[-1][1], color='blue')
 
+        # Plot the last three robot positions with reducing opacity
+        for i in range(1, 4):
+            if len(robot_path) > i:
+                ax.scatter(robot_path[-i][0], robot_path[-i][1], color='blue', alpha=1/i)
+                
+
         img_bytes = io.BytesIO()
         plt.savefig(img_bytes, format='png')
         img_bytes.seek(0)

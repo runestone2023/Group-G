@@ -16,7 +16,7 @@ class Map:
         self.map[self.current_location[0] + observation.get_x()][self.current_location[1] + observation.get_y()] = observation
 
     def update_current_location(self, distance, angle):
-        self.current_location = (distance * cos(radians(angle)) + self.current_location[0], distance * sin(radians(angle)) + self.current_location[1])
+        self.current_location = (distance * sin(radians(angle)) + self.current_location[0], distance * cos(radians(angle)) + self.current_location[1])
         self.robot_path.append(self.current_location)
 
     

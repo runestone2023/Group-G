@@ -14,14 +14,18 @@ from simple_pid import PID
 from RobotCommunicator import RobotCommunicatorClient
 import time
 
-HOST = '192.168.0.3'
+HOST = '192.168.0.2'
 PORT = 65530
 
 is_automatic = False 
+is_move_forward = False
 has_anything_in_claw = False
+square_center_position = (0, 0)
 
 rotate_angle_factor = 2.39
 max_distance_us = 100
+
+previous_position = 0
 
 steer_speed = SpeedPercent(40)
 gyro_offset = 10
@@ -33,8 +37,6 @@ class AngleLearner:
         self.angle = 45
 
     def update(self, sensor_offset):
-        # global steer_speed
-        # steer_speed = SpeedPercent(rotation_speed)
         global gyro_offset
         gyro_offset = sensor_offset
         steer(self.angle, motors)
@@ -43,6 +45,17 @@ class AngleLearner:
 
 def move_forward(speed, motors):
     motors.on(0, speed)
+
+    global previous_position, cumulative_angle
+    if (speed == 0):
+        travelled_angle = left_motor.position - previous_position
+        travelled_distance = (travelled_angle / 360) * (3.14159 * 5.6)
+        robot_comm.send_message({"command": "update_map", "distance": travelled_distance, "angle": cumulative_angle})
+        motors.gyro.reset()
+        cumulative_angle = 0
+    else:
+        previous_position = left_motor.position
+
 
 def move_forward_distance(speed, distance, motors):
     motors.on_for_rotations(0, speed, distance / (3.14 * 5.6))
@@ -66,15 +79,11 @@ def steer(angle, motors):
 def learn_angle_pid(iterations):
     angle_learner = AngleLearner()
 
-
     motors.gyro.reset()
-
     
     original_offset = gyro_offset
 
     pid = PID(0.5, 0.01, 0.2, setpoint=angle_learner.angle)
-
-    # pid.output_limits = (-40, 5)
 
     steer(angle_learner.angle, motors)
     current_angle = motors.gyro.angle
@@ -86,12 +95,6 @@ def learn_angle_pid(iterations):
         print("Iteration: ", iter)
         sensor_offset = pid(abs(current_angle))
         gyro_o = original_offset - sensor_offset
-        # if abs(rotation_speed) == 0:
-        #     rotation_speed = 2
-        # elif abs(rotation_speed) < 2:
-        #     rotation_speed = 2 * (rotation_speed / abs(rotation_speed))
-        # elif abs(rotation_speed) > 100:
-        #     rotation_speed = 100 * (rotation_speed / abs(rotation_speed))
         current_angle = angle_learner.update(gyro_o)
         print("Current Angle:", current_angle,"gyro offset: ", gyro_o , "sensor offset: ", sensor_offset)
         if (abs(abs(current_angle) - abs(angle_learner.angle)) < 2):
@@ -107,34 +110,47 @@ if __name__ == "__main__":
     motors=MoveSteering(OUTPUT_B, OUTPUT_C, motor_class=LargeMotor)
     motors.gyro=GyroSensor()
     motors.gyro.calibrate()
+
+    left_motor=LargeMotor(OUTPUT_B)
+    right_motor=LargeMotor(OUTPUT_C)
+
     color_sensor=ColorSensor()
 
     claw=MediumMotor(OUTPUT_D)
-    # us = UltrasonicSensor()
-
 
     sound=Sound()
 
     robot_comm.start()
 
+    current_location = (0, 0)
+
     sound.beep()
     while True:
 
         if is_automatic:
-            # distance = us.distance_centimeters
             if color_sensor.color == ColorSensor.COLOR_RED and not has_anything_in_claw:
                 move_forward_distance(-10, 5, motors)
                 claw.on_for_rotations(60, 5)
                 has_anything_in_claw = True
                 robot_comm.send_message({"command": "grabbed_item", "sender": 0})
 
-            # if distance <= max_distance_us:
-            #     # robot_comm.send_message({"distance": distance, "type": "obs"})
-            #     steer(-90, motors)
-                
-            # else:
-            #     # robot_comm.send_message({"distance": distance, "type": "free"})
-            #     move_forward(100, motors)
+            travelled_angle = left_motor.position - previous_position
+            travelled_distance = (travelled_angle / 360) * (3.14159 * 5.6)
+            robot_comm.send_message({"command": "update_map", "distance": travelled_distance, "angle": cumulative_angle})
+
+            robot_comm.send_message({"command": "give_location", "sender": 0})
+            # Roam in a square based on the current location of the robot
+            
+            if not ((current_location[0] < 150 and current_location[0] > -150) and (current_location[1] < 150 and current_location[1] > -150)):
+                is_move_forward = False
+                move_forward(0, motors)
+                steer(180, motors)
+
+            elif not is_move_forward:
+                move_forward(10, motors)
+                is_move_forward = True
+
+            previous_position = left_motor.position
                 
         msg=robot_comm.pop_message()
         if not msg:
@@ -144,10 +160,6 @@ if __name__ == "__main__":
         print("Received command: ", command)
 
         if command == "move_forward":
-            # if msg.get("speed") == 0:
-            #     print("Travelled distance", ((motors.position - initial_position) / 360) * ())
-            # else:
-            #     initial_position = motors.position
             move_forward(msg.get("speed"), motors)
 
         elif command == "move_forward_distance":
@@ -169,6 +181,9 @@ if __name__ == "__main__":
         elif command == "automatic":
             automatic_status = msg.get("automatic")
             is_automatic = automatic_status
+            square_center_position = msg.get("position")
+            previous_position = left_motor.position
+            print("SQUARE CENTER POSITION: " + str(square_center_position))
 
         elif command == "go_origin":
             sound.beep()
@@ -182,6 +197,10 @@ if __name__ == "__main__":
             claw.on_for_rotations(60, -5)
             has_anything_in_claw = False
 
+        elif command == "give_location":
+            current_location = msg.get("location")
+            print("Current location: ", current_location)
+        
         elif command == "scan":
             us = UltrasonicSensor()
             distance = us.distance_centimeters
