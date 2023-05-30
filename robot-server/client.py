@@ -99,9 +99,9 @@ if __name__ == "__main__":
         msg=robot_comm.pop_message()
 
         if has_anything_in_claw:
-            travelled_angle = left_motor.position - previous_position
-            travelled_distance = (travelled_angle / 360) * (3.14159 * 5.6)
-            robot_comm.send_message({"command": "grabbed_item", "distance": travelled_distance, "angle": cumulative_angle, "sender": 0})
+            # travelled_angle = left_motor.position - previous_position
+            # travelled_distance = (travelled_angle / 360) * (3.14159 * 5.6)
+            robot_comm.send_message({"command": "grabbed_item", "sender": 0})
             is_automatic = False
             has_anything_in_claw = False
 

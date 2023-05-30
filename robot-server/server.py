@@ -121,10 +121,8 @@ async def send_learn(client_id: int, body: LearnCmd):
 def go_origin(sender, distance):
         global cumulative_angle
 
-        # cumulative_angle[sender] += angle
-
-        maps[sender].update_current_location(distance, cumulative_angle[sender])
-        print("Current location: ", maps[sender].current_location)
+        # maps[sender].update_current_location(distance, cumulative_angle[sender])
+        # print("Current location: ", maps[sender].current_location)
 
         return_vector = (0 - maps[sender].current_location[0], 0 - maps[sender].current_location[1]) 
         vector_horizontal_angle = degrees(atan(return_vector[0] / return_vector[1]))
@@ -170,7 +168,7 @@ def event_loop():
         sender = [id for id in robot_server._connected_clients.keys() if robot_server._connected_clients[id][0] == msg.get('addr')[0]][0]
 
         if command == "grabbed_item":
-            go_origin(sender, msg.get("distance"))
+            go_origin(sender)
         
         elif command == "update_map":
             print("UPDATING MAP RIGHT NOW")
