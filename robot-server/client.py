@@ -21,7 +21,7 @@ is_automatic = False
 is_move_forward = False
 square_center_position = (0, 0)
 
-rotate_angle_factor = 1.89
+rotate_angle_factor = 1.56
 max_distance_us = 100
 
 previous_position = 0
@@ -106,7 +106,7 @@ if __name__ == "__main__":
             if has_anything_in_claw: continue
 
             direction = 1
-            move_forward_distance(20, 50, motors)
+            move_forward_distance(25, 80, motors)
 
             has_anything_in_claw = check_for_item()
             if has_anything_in_claw: continue
@@ -116,7 +116,7 @@ if __name__ == "__main__":
             has_anything_in_claw = check_for_item()
             if has_anything_in_claw: continue
 
-            move_forward_distance(20, 10, motors)
+            move_forward_distance(25, 10, motors)
 
             has_anything_in_claw = check_for_item()
             if has_anything_in_claw: continue
