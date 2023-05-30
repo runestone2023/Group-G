@@ -16,4 +16,4 @@ server:
 
 client:
 	@scp -r ./robot-server/*.py robot@${ROBOT_IP}:~/
-	@ssh robot@${ROBOT_IP} '~/client.py && pkill python'
+	@ssh robot@${ROBOT_IP} 'pkill python; ~/client.py'

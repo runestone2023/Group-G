@@ -67,13 +67,17 @@ function App() {
 
   const startHandler = () => {
     axios
-      .post(`http://localhost:8000/clients/${id}/automatic`, {"automatic": false})
+      .post(`http://localhost:8000/clients/${id}/automatic`, {
+        automatic: false,
+      })
       .then((res) => console.log(res.data, res));
   };
 
   const stopHandler = () => {
     axios
-      .post(`http://localhost:8000/clients/${id}/automatic`, {"automatic": true})
+      .post(`http://localhost:8000/clients/${id}/automatic`, {
+        automatic: true,
+      })
       .then((res) => console.log(res.data, res));
   };
 
@@ -116,7 +120,7 @@ function App() {
       })
       .then((res) => console.log(res.data, res));
 
-      mapImgHandle();
+    mapImgHandle();
   };
 
   // back
@@ -429,21 +433,6 @@ function App() {
           <div className="col-sm">
             <Card className="border border-warning bg-dark text-white">
               Map
-              <input
-                type="text"
-                placeholder="Distance"
-                className="col-xs-2 form-control"
-                style={{ backgroundColor: "#212529", color: "white" }}
-                onChange={(e) => {
-                  selectDistance(e.target.value);
-                }}
-              />
-              <button
-                className="btn btn-sm btn-warning btn-outline-danger text-dark m-2"
-                onClick={distanceHandler}
-              >
-                Go
-              </button>
               {imagePlot.length > 0 && (
                 <img
                   src={`data:image/png;base64,${imagePlot}`}

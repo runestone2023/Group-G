@@ -4,7 +4,7 @@ while true; do
   read -rsn1 input
   if [ "$input" = "w" ]; then
     curl -X 'POST' \
-      'http://127.0.0.1:8000/clients/0/move' \
+      'http://127.0.0.1:8000/clients/1/move' \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -13,7 +13,7 @@ while true; do
   fi
   if [ "$input" = "s" ]; then
     curl -X 'POST' \
-      'http://127.0.0.1:8000/clients/0/move' \
+      'http://127.0.0.1:8000/clients/1/move' \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -22,7 +22,7 @@ while true; do
   fi
   if [ "$input" = "a" ]; then
 		curl -X 'POST' \
-			'http://127.0.0.1:8000/clients/0/rotate' \
+			'http://127.0.0.1:8000/clients/1/rotate' \
 			-H 'accept: application/json' \
 			-H 'Content-Type: application/json' \
 			-d '{
@@ -31,7 +31,7 @@ while true; do
   fi
   if [ "$input" = "d" ]; then
 		curl -X 'POST' \
-			'http://127.0.0.1:8000/clients/0/rotate' \
+			'http://127.0.0.1:8000/clients/1/rotate' \
 			-H 'accept: application/json' \
 			-H 'Content-Type: application/json' \
 			-d '{
@@ -40,7 +40,7 @@ while true; do
   fi
   if [ "$input" = "r" ]; then
 		curl -X 'POST' \
-			'http://127.0.0.1:8000/clients/0/rotate' \
+			'http://127.0.0.1:8000/clients/1/rotate' \
 			-H 'accept: application/json' \
 			-H 'Content-Type: application/json' \
 			-d '{
@@ -49,15 +49,15 @@ while true; do
   fi
   if [ "$input" = "b" ]; then
 		curl -X 'POST' \
-			'http://127.0.0.1:8000/clients/0/beep'
+			'http://127.0.0.1:8000/clients/1/beep'
   fi
   if [ "$input" = "x" ]; then
 		curl -X 'POST' \
-			'http://127.0.0.1:8000/clients/0/shutdown'
+			'http://127.0.0.1:8000/clients/1/shutdown'
   fi
   if [ "$input" = "C" ]; then
     curl -X 'POST' \
-      'http://127.0.0.1:8000/clients/0/claw' \
+      'http://127.0.0.1:8000/clients/1/claw' \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -66,7 +66,7 @@ while true; do
   fi
   if [ "$input" = "c" ]; then
     curl -X 'POST' \
-      'http://127.0.0.1:8000/clients/0/claw' \
+      'http://127.0.0.1:8000/clients/1/claw' \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
