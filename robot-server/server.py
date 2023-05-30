@@ -70,7 +70,6 @@ async def send_move_distance(client_id: int, body: MoveDistCmd):
     maps[client_id].update_current_location(res['distance'], cumulative_angle[client_id])
     print("Current location: ", maps[client_id].current_location)
 
-    
     return {"client_id": client_id, 'move_forward_distance': res}
 
 @app.get("/clients/{client_id}/map")
@@ -119,11 +118,16 @@ async def send_learn(client_id: int, body: LearnCmd):
     return {"client_id": client_id, 'learn_result': res}
 
 
-def go_origin(sender):
+def go_origin(sender, distance):
         global cumulative_angle
 
+        # cumulative_angle[sender] += angle
+
+        maps[sender].update_current_location(distance, cumulative_angle[sender])
+        print("Current location: ", maps[sender].current_location)
+
         return_vector = (0 - maps[sender].current_location[0], 0 - maps[sender].current_location[1]) 
-        vector_horizontal_angle = degrees(atan(return_vector[1] / return_vector[0]))
+        vector_horizontal_angle = degrees(atan(return_vector[0] / return_vector[1]))
 
         return_angle = 180 - abs(vector_horizontal_angle - cumulative_angle[sender])
 
@@ -133,14 +137,14 @@ def go_origin(sender):
 
         return_angle = return_angle if cumulative_angle[sender] > 0 else -return_angle
 
-        if (maps[sender].current_location[0] < 0):
-            return_angle = 180 - return_angle
+        if (maps[sender].current_location[1] < 0):
+            return_angle = 180 - abs(return_angle)
             
         robot_server.send_message({'command': 'go_origin', 'angle': return_angle if cumulative_angle[sender] > 0 else -return_angle, 'distance': return_distance}, sender)
 
         while robot_server._recv_messages == []:
-            print("Waiting for answer")
-        pass
+            # print("Waiting for answer")
+            pass
         
         res = robot_server._recv_messages.pop(0)
 
@@ -152,7 +156,7 @@ def go_origin(sender):
         diff_from_origin = (0 - maps[sender].current_location[0], 0 - maps[sender].current_location[1])
         
         if (hypot(diff_from_origin[0], diff_from_origin[1]) > 10):
-            go_origin(sender)
+            go_origin(sender, 0)
             # res = robot_server.send_message({'command': 'drop_item'}, sender)
         else:
             res = robot_server.send_message({'command': 'drop_item'}, sender)
@@ -172,15 +176,12 @@ def event_loop():
         sender = [id for id in robot_server._connected_clients.keys() if robot_server._connected_clients[id][0] == msg.get('addr')[0]][0]
 
         if command == "grabbed_item":
-            go_origin(sender)
+            go_origin(sender, msg.get("distance"))
         
         elif command == "update_map":
             print("UPDATING MAP RIGHT NOW")
             global cumulative_angle
             cumulative_angle[sender] += msg.get('angle')
-
-            # if body.speed < 0:
-                # res['distance'] *= -1
 
             maps[sender].update_current_location(msg.get('distance'), cumulative_angle[sender])
             print("Current location: ", maps[sender].current_location)

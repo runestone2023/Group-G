@@ -75,6 +75,7 @@ def steer(angle, motors):
 
     global cumulative_angle
     cumulative_angle += motors.gyro.angle
+    print("Rotated. Cumulative Angle: ", cumulative_angle)
 
 def learn_angle_pid(iterations):
     angle_learner = AngleLearner()
@@ -129,28 +130,12 @@ if __name__ == "__main__":
 
         if is_automatic:
             if color_sensor.color == ColorSensor.COLOR_RED and not has_anything_in_claw:
+                travelled_angle = left_motor.position - previous_position
+                travelled_distance = (travelled_angle / 360) * (3.14159 * 5.6)
+                robot_comm.send_message({"command": "grabbed_item", "distance": travelled_distance, "angle": cumulative_angle, "sender": 0})
                 move_forward_distance(-10, 5, motors)
                 claw.on_for_rotations(60, 5)
                 has_anything_in_claw = True
-                robot_comm.send_message({"command": "grabbed_item", "sender": 0})
-
-            travelled_angle = left_motor.position - previous_position
-            travelled_distance = (travelled_angle / 360) * (3.14159 * 5.6)
-            robot_comm.send_message({"command": "update_map", "distance": travelled_distance, "angle": cumulative_angle})
-
-            robot_comm.send_message({"command": "give_location", "sender": 0})
-            # Roam in a square based on the current location of the robot
-            
-            if not ((current_location[0] < 150 and current_location[0] > -150) and (current_location[1] < 150 and current_location[1] > -150)):
-                is_move_forward = False
-                move_forward(0, motors)
-                steer(180, motors)
-
-            elif not is_move_forward:
-                move_forward(10, motors)
-                is_move_forward = True
-
-            previous_position = left_motor.position
                 
         msg=robot_comm.pop_message()
         if not msg:
@@ -187,8 +172,15 @@ if __name__ == "__main__":
 
         elif command == "go_origin":
             sound.beep()
-            steer(msg.get("angle"), motors)
-            move_forward_distance(60, msg.get("distance"), motors)
+
+            rot_ang = abs(msg.get("angle")) % 360
+
+            if (msg.get("angle") < 0):
+                rot_ang *= -1
+            
+            steer(rot_ang, motors)
+            print("Rotating for: ", rot_ang, "Cumulative angle: ", cumulative_angle)
+            move_forward_distance(40, msg.get("distance"), motors)
             robot_comm.send_message({"distance": msg.get("distance"), "angle": cumulative_angle})
             motors.gyro.reset()
             cumulative_angle = 0
