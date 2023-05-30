@@ -153,13 +153,7 @@ def go_origin(sender, distance):
         maps[sender].update_current_location(res['distance'], cumulative_angle[sender])
         print("Current location: ", maps[sender].current_location)
 
-        diff_from_origin = (0 - maps[sender].current_location[0], 0 - maps[sender].current_location[1])
-        
-        if (hypot(diff_from_origin[0], diff_from_origin[1]) > 10):
-            go_origin(sender, 0)
-            # res = robot_server.send_message({'command': 'drop_item'}, sender)
-        else:
-            res = robot_server.send_message({'command': 'drop_item'}, sender)
+        res = robot_server.send_message({'command': 'drop_item'}, sender)
 
 # Event loop for communicatimg with robots
 def event_loop():
